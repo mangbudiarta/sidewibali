@@ -21,7 +21,7 @@ class DetailPaketwisata extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Image.network(
+                Image.asset(
                   paketWisata.gambar,
                   fit: BoxFit.cover,
                   width: double.infinity,

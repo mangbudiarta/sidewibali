@@ -52,7 +52,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
           children: [
             Stack(
               children: [
-                Image.network(
+                Image.asset(
                   widget.destinasi.gambar,
                   height: 400,
                   fit: BoxFit.cover,

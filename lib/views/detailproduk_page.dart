@@ -21,7 +21,7 @@ class DetailProduk extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Image.network(
+                Image.asset(
                   produk.gambar,
                   fit: BoxFit.cover,
                   width: double.infinity,
