@@ -198,7 +198,7 @@ class MainPage extends StatelessWidget {
             ),
             child: GridView.count(
               crossAxisCount: 4,
-              childAspectRatio: 1.2,
+              childAspectRatio: 1.0,
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               children: [
