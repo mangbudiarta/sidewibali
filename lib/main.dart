@@ -59,8 +59,8 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 2));
 
     if (onboardingShown) {
-      Navigator.of(context).pushReplacementNamed('/homepage');
-      // Navigator.of(context).pushReplacementNamed('/onboarding');
+      // Navigator.of(context).pushReplacementNamed('/homepage');
+      Navigator.of(context).pushReplacementNamed('/onboarding');
     } else {
       _controller.addStatusListener((status) {
         if (status == AnimationStatus.completed) {

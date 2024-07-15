@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sidewibali/models/desa.dart';
+import 'package:sidewibali/models/desa_model.dart';
 import 'package:sidewibali/views/detaildesa_page.dart';
 
 class DesaWisataPage extends StatefulWidget {

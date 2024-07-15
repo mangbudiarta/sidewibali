@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sidewibali/models/produk.dart';
+import 'package:sidewibali/models/produk_model.dart';
 
 class DetailProduk extends StatelessWidget {
   final Produk produk;
@@ -30,11 +30,24 @@ class DetailProduk extends StatelessWidget {
                 Positioned(
                   top: 16,
                   left: 16,
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 6.0,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ),
               ],

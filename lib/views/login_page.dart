@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/forgotpass_page.dart';
 import 'package:sidewibali/views/registrasi_page.dart';
+import 'package:sidewibali/views/home_page.dart';
+import 'package:sidewibali/services/api_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -16,6 +18,29 @@ class _LoginViewState extends State<LoginView> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  Future<void> _login() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+
+      var result = await ApiService.loginUser(email, password);
+
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login successful!')),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: ${result['message']}')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,12 +166,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      String email = _emailController.text.trim();
-                      String password = _passwordController.text.trim();
-                    }
-                  },
+                  onPressed: _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primary,
                     foregroundColor: Colors.white,
