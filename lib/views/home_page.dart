@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:sidewibali/models/destinasi.dart';
+import 'package:sidewibali/models/destinasi_model.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
 import 'package:sidewibali/views/listdesa_page.dart';

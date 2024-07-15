@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sidewibali/models/berita.dart'; // Import model Berita
+import 'package:sidewibali/models/berita_model.dart'; // Import model Berita
 import 'detailberita_page.dart';
 
 class BeritaPage extends StatefulWidget {

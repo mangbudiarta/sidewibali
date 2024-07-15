@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/login_page.dart';
+import 'package:sidewibali/models/user_model.dart';
+import 'package:sidewibali/services/api_service.dart';
+import 'dart:developer';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -10,13 +13,45 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
-  bool _keepSignedIn = false;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  Future<void> _register() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      String name = _nameController.text.trim();
+      String email = _emailController.text.trim();
+      String password = _passwordController.text;
+      String phone = _phoneController.text.trim();
+
+      User newUser = User(
+        nama: name,
+        email: email,
+        password: password,
+        no_telp: phone,
+      );
+      bool success = await ApiService.registerUser(newUser);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration successful!')),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginView()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed!')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +68,7 @@ class _RegisterViewState extends State<RegisterView> {
                 Center(
                   child: Image.asset(
                     'assets/images/logo_text_max.png',
-                    width: 10000,
+                    width: 100,
                   ),
                 ),
                 SizedBox(height: 20),
@@ -49,6 +84,25 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 SizedBox(height: 40),
                 TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: "Name",
+                    hintText: "Enter your name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 16),
+                TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: "Email",
@@ -59,8 +113,6 @@ class _RegisterViewState extends State<RegisterView> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
-                  // validasi inputan
-
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -99,8 +151,6 @@ class _RegisterViewState extends State<RegisterView> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
-                  // validasi inputan
-
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -139,7 +189,6 @@ class _RegisterViewState extends State<RegisterView> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
-                  // validasi inputan
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please confirm your password';
@@ -150,14 +199,27 @@ class _RegisterViewState extends State<RegisterView> {
                   },
                 ),
                 SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      String email = _emailController.text.trim();
-                      String password = _passwordController.text;
-                      String confirmPassword = _confirmPasswordController.text;
+                TextFormField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    labelText: "Phone Number",
+                    hintText: "Enter your phone number",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone number';
                     }
+                    return null;
                   },
+                ),
+                SizedBox(height: 16),
+                GestureDetector(
+                  onTap: _register,
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 13.5),
@@ -190,8 +252,7 @@ class _RegisterViewState extends State<RegisterView> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoginView(),
-                            ),
+                                builder: (context) => LoginView()),
                           );
                         },
                         child: Text(

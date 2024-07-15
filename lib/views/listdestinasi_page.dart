@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
-import 'package:sidewibali/models/destinasi.dart';
+import 'package:sidewibali/models/destinasi_model.dart';
 
 class DestinasiPage extends StatefulWidget {
   @override

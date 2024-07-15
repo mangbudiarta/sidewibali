@@ -61,21 +61,29 @@ class _FavoritePageState extends State<FavoritePage> {
                         Positioned(
                           top: 8,
                           right: 8,
-                          child: IconButton(
-                            icon: Icon(
-                              favoriteDestinations[index].isLiked
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: favoriteDestinations[index].isLiked
-                                  ? Colors.red
-                                  : Colors.grey,
-                            ),
-                            onPressed: () {
+                          child: GestureDetector(
+                            onTap: () {
                               setState(() {
                                 favoriteDestinations[index].isLiked =
                                     !favoriteDestinations[index].isLiked;
                               });
                             },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              child: Icon(
+                                favoriteDestinations[index].isLiked
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: favoriteDestinations[index].isLiked
+                                    ? Colors.red
+                                    : Colors.grey,
+                              ),
+                            ),
                           ),
                         ),
                       ],

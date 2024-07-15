@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sidewibali/models/akomodasi.dart';
+import 'package:sidewibali/models/akomodasi_model.dart';
 import 'package:sidewibali/views/detailakomodasi_page.dart';
 
 class AkomodasiPage extends StatefulWidget {
