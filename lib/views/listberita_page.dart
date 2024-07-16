@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:sidewibali/models/berita_model.dart'; // Import model Berita
 import 'detailberita_page.dart';
+
+class Berita {
+  final String judul;
+  final String isi_berita;
+  final String gambar;
+  final int id_desawisata;
+  final DateTime timestamp;
+
+  Berita({
+    required this.judul,
+    required this.isi_berita,
+    required this.gambar,
+    required this.id_desawisata,
+    required this.timestamp,
+  });
+}
 
 class BeritaPage extends StatefulWidget {
   @override
@@ -13,23 +28,26 @@ class _BeritaPageState extends State<BeritaPage> {
       judul:
           '19 Festival Akan Digelar Di Bali Pada Agustus 2024, Termasuk Rare Angon Kite Festival',
       isi_berita:
-          'Pada Agustus 2024, Bali akan menjadi tuan rumah bagi 19 festival menarik yang menampilkan kekayaan budaya, seni, dan tradisi pulau ini. Salah satu festival yang paling dinantikan adalah Rare Angon Kite Festival, sebuah perayaan layang-layang tradisional Bali yang diadakan setiap tahun. Festival ini tidak hanya menampilkan layang-layang dengan berbagai bentuk dan ukuran, tetapi juga memperlihatkan keterampilan dan kreativitas para pembuat layang-layang lokal. Acara ini menarik perhatian baik penduduk setempat maupun wisatawan, memberikan kesempatan untuk menikmati suasana yang meriah dan keindahan langit Bali yang dihiasi layang-layang berwarna-warni. Selain Rare Angon Kite Festival, berbagai acara lainnya juga akan diadakan, menambah semarak bulan Agustus di Bali dan menawarkan pengalaman budaya yang tak terlupakan bagi semua pengunjung',
+          'Pada Agustus 2024, Bali akan menjadi tuan rumah bagi 19 festival menarik yang menampilkan kekayaan budaya, seni, dan tradisi pulau ini...',
       gambar: 'assets/images/news.png',
       id_desawisata: 1,
+      timestamp: DateTime(2024, 7, 10),
     ),
     Berita(
       judul: 'Pembukaan Festival Budaya',
       isi_berita:
-          'Pada Agustus 2024, Bali akan menyelenggarakan 19 festival budaya yang luar biasa, termasuk pembukaan Festival Budaya yang akan menjadi sorotan utama bulan tersebut. Acara ini akan menampilkan berbagai aspek seni dan tradisi Bali, dari tarian dan musik tradisional hingga pameran seni dan kerajinan tangan lokal. Festival Budaya ini bertujuan untuk merayakan dan melestarikan warisan budaya Bali, serta memberikan pengunjung kesempatan untuk merasakan kekayaan dan keragaman budaya pulau ini. Pembukaan festival ini akan menjadi momen istimewa yang tidak boleh dilewatkan, menandai awal dari rangkaian acara yang penuh warna dan energi di seluruh Bali sepanjang bulan Agustus.',
+          'Pada Agustus 2024, Bali akan menyelenggarakan 19 festival budaya yang luar biasa...',
       gambar: 'assets/images/news.png',
       id_desawisata: 2,
+      timestamp: DateTime(2024, 7, 8),
     ),
     Berita(
       judul: 'Festival Lomba Tari Bali',
       isi_berita:
-          'Pada Agustus 2024, Bali akan menggelar 19 festival budaya yang meriah, salah satunya adalah lomba tari Bali yang akan menjadi bagian dari rangkaian acara ini. Lomba tari Bali ini akan menampilkan berbagai jenis tarian tradisional Bali, seperti tari Legong, tari Kecak, tari Barong, dan tari Pendet. Peserta dari berbagai usia dan latar belakang akan menunjukkan keterampilan dan keindahan gerakan mereka dalam kompetisi yang penuh semangat dan antusiasme.',
+          'Pada Agustus 2024, Bali akan menggelar 19 festival budaya yang meriah...',
       gambar: 'assets/images/news.png',
       id_desawisata: 3,
+      timestamp: DateTime(2024, 7, 9),
     ),
   ];
 
@@ -44,10 +62,14 @@ class _BeritaPageState extends State<BeritaPage> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+
     var filteredList = dummyBerita
         .where((berita) =>
             berita.judul.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
+
+    // Sort the filtered list by timestamp in descending order
+    filteredList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     return Scaffold(
       appBar: AppBar(
@@ -99,6 +121,7 @@ class _BeritaPageState extends State<BeritaPage> {
                         MaterialPageRoute(
                           builder: (context) => DetailBerita(
                             berita: berita,
+                            desaMap: desaMap,
                           ),
                         ),
                       );
@@ -118,33 +141,89 @@ class _BeritaPageState extends State<BeritaPage> {
                             ),
                           ],
                         ),
-                        child: ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              berita.gambar,
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset(
+                                berita.gambar,
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                          title: Text(
-                            berita.judul,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.3),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(20),
+                                    bottomRight: Radius.circular(20),
+                                  ),
+                                ),
+                                child: Text(
+                                  berita.judul.length > 50
+                                      ? '${berita.judul.substring(0, 50)}...'
+                                      : berita.judul,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          subtitle: Text(
-                            desaMap[berita.id_desawisata] ??
-                                'Desa Tidak Diketahui',
-                          ),
+                          ],
                         ),
                       ),
                     ),
                   );
                 },
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DetailBerita extends StatelessWidget {
+  final Berita berita;
+  final Map<int, String> desaMap;
+
+  DetailBerita({required this.berita, required this.desaMap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(berita.judul),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(berita.gambar),
+            SizedBox(height: 16.0),
+            Text(
+              berita.judul,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Desa: ${desaMap[berita.id_desawisata]}',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 16.0),
+            Text(
+              berita.isi_berita,
+              style: TextStyle(fontSize: 16),
             ),
           ],
         ),
