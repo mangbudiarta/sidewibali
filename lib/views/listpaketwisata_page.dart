@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sidewibali/models/paketwisata_model.dart';
-import 'package:sidewibali/models/produk_model.dart';
 import 'package:sidewibali/models/desa_model.dart';
-import 'package:sidewibali/views/detailproduk_page.dart';
+import 'package:sidewibali/views/detailpaketwisata_page.dart';
 
 class PaketWisataPage extends StatefulWidget {
+  const PaketWisataPage({super.key});
+
   @override
   _PaketWisataPageState createState() => _PaketWisataPageState();
 }
@@ -82,7 +83,7 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Paket Wisata',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -108,7 +109,7 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Cari',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
@@ -117,7 +118,7 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Expanded(
               child: ListView.builder(
                 itemCount: filteredPaketWisata.length,
@@ -130,8 +131,8 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailProduk(
-                            produk: Produk(
+                          builder: (context) => DetailPaketwisata(
+                            paketWisata: PaketWisata(
                               nama: paketWisata.nama,
                               harga: paketWisata.harga,
                               deskripsi: paketWisata.deskripsi,
@@ -159,7 +160,8 @@ class CardPaketWisata extends StatelessWidget {
   final String Function(int) getDesaNama;
   final VoidCallback onTap;
 
-  CardPaketWisata({
+  const CardPaketWisata({
+    super.key,
     required this.paketWisata,
     required this.getDesaNama,
     required this.onTap,
@@ -180,7 +182,7 @@ class CardPaketWisata extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.2),
                 spreadRadius: 2,
                 blurRadius: 7,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),

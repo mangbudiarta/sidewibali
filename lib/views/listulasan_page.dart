@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class UlasanPage extends StatefulWidget {
+  const UlasanPage({super.key});
+
   @override
   _UlasanPageState createState() => _UlasanPageState();
 }
@@ -64,7 +66,7 @@ class _UlasanPageState extends State<UlasanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ulasan',
+        title: const Text('Ulasan',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -88,7 +90,7 @@ class _UlasanPageState extends State<UlasanPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Cari',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
@@ -97,7 +99,7 @@ class _UlasanPageState extends State<UlasanPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             // Filter Berdasarkan Bintang
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -107,9 +109,9 @@ class _UlasanPageState extends State<UlasanPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: ChoiceChip(
                       label: Text(filter),
-                      labelStyle: TextStyle(color: Colors.black),
+                      labelStyle: const TextStyle(color: Colors.black),
                       backgroundColor: Colors.grey[200],
-                      selectedColor: Color.fromARGB(255, 172, 241, 244),
+                      selectedColor: const Color.fromARGB(255, 172, 241, 244),
                       selected: selectedFilter == filter,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
@@ -124,7 +126,7 @@ class _UlasanPageState extends State<UlasanPage> {
                 }).toList(),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
 
             Expanded(
               child: ListView(
@@ -158,7 +160,7 @@ class _UlasanPageState extends State<UlasanPage> {
               color: Colors.grey.withOpacity(0.2),
               spreadRadius: 2,
               blurRadius: 7,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -179,8 +181,8 @@ class _UlasanPageState extends State<UlasanPage> {
               Text(location),
               Row(
                 children: [
-                  Icon(Icons.star, color: Colors.amber, size: 16),
-                  SizedBox(width: 4),
+                  const Icon(Icons.star, color: Colors.amber, size: 16),
+                  const SizedBox(width: 4),
                   Text('$rating'),
                 ],
               ),

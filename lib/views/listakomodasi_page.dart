@@ -3,6 +3,8 @@ import 'package:sidewibali/models/akomodasi_model.dart';
 import 'package:sidewibali/views/detailakomodasi_page.dart';
 
 class AkomodasiPage extends StatefulWidget {
+  const AkomodasiPage({super.key});
+
   @override
   _AkomodasiPageState createState() => _AkomodasiPageState();
 }
@@ -56,7 +58,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Akomodasi',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -82,7 +84,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Cari',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
@@ -91,7 +93,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             // Filter Berdasarkan Kategori
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -101,9 +103,9 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: ChoiceChip(
                       label: Text(category),
-                      labelStyle: TextStyle(color: Colors.black),
+                      labelStyle: const TextStyle(color: Colors.black),
                       backgroundColor: Colors.grey[200],
-                      selectedColor: Color.fromARGB(255, 172, 241, 244),
+                      selectedColor: const Color.fromARGB(255, 172, 241, 244),
                       selected: selectedCategory == category,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
@@ -155,7 +157,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                 color: Colors.grey.withOpacity(0.2),
                 spreadRadius: 2,
                 blurRadius: 7,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sidewibali/views/login_page.dart';
 import 'package:sidewibali/views/onboarding_page.dart';
 import 'package:sidewibali/views/home_page.dart';
 import 'package:sidewibali/views/registrasi_page.dart';
@@ -20,16 +21,17 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/homepage': (context) => const HomePage(),
+        '/homepage': (context) => const HomePage(userDetails: {}),
         '/registration': (context) => const RegisterView(),
         '/onboarding': (context) => const OnboardingView(),
+        '/login': (context) => const LoginView(),
       },
     );
   }
 }
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -56,11 +58,17 @@ class _SplashScreenState extends State<SplashScreen>
   void _initApp() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool onboardingShown = prefs.getBool('onboardingShown') ?? false;
+    String? token = prefs.getString('token');
+
     await Future.delayed(const Duration(seconds: 2));
 
     if (onboardingShown) {
-      // Navigator.of(context).pushReplacementNamed('/homepage');
-      Navigator.of(context).pushReplacementNamed('/onboarding');
+      if (token != null) {
+        // Redirect to homepage if token exists
+        Navigator.of(context).pushReplacementNamed('/homepage');
+      } else {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
     } else {
       _controller.addStatusListener((status) {
         if (status == AnimationStatus.completed) {

@@ -4,7 +4,7 @@ import 'package:sidewibali/models/akomodasi_model.dart';
 class DetailAkomodasi extends StatelessWidget {
   final Akomodasi akomodasi;
 
-  DetailAkomodasi({required this.akomodasi});
+  const DetailAkomodasi({super.key, required this.akomodasi});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class DetailAkomodasi extends StatelessWidget {
                   top: 16,
                   left: 16,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -36,7 +36,7 @@ class DetailAkomodasi extends StatelessWidget {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -54,32 +54,32 @@ class DetailAkomodasi extends StatelessWidget {
                     children: [
                       Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Text(
                           akomodasi.kategori,
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     akomodasi.nama,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.grey),
-                      SizedBox(width: 4),
+                      const Icon(Icons.location_on, color: Colors.grey),
+                      const SizedBox(width: 4),
                       Text(
                         fetchNamaDesa(akomodasi.id_desawisata),
                         style: TextStyle(

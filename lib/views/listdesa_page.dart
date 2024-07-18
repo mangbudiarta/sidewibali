@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sidewibali/models/desa_model.dart';
 import 'package:sidewibali/views/detaildesa_page.dart';
+import 'package:sidewibali/services/api_service.dart';
 
 class DesaWisataPage extends StatefulWidget {
+  const DesaWisataPage({super.key});
+
   @override
   _DesaWisataPageState createState() => _DesaWisataPageState();
 }
@@ -11,6 +15,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
   String selectedCategory = 'Semua';
   String selectedKabupaten = 'Badung';
   String searchQuery = '';
+  late Future<List<DesaWisata>> futureDesaWisataList;
 
   List<String> categories = [
     'Semua',
@@ -20,6 +25,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
     'Mandiri',
     'Kabupaten'
   ];
+
   List<String> kabupaten = [
     'Badung',
     'Bangli',
@@ -32,43 +38,15 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
     'Tabanan'
   ];
 
-  List<Map<String, dynamic>> destinations = [
-    {
-      'id': 1,
-      'gambar': 'assets/images/beratan.png',
-      'nama': 'Desa Wisata Candikuning',
-      'kabupaten': 'Tabanan',
-      'deskripsi': 'deskripsi desa beratan',
-      'alamat': 'Candikuning, Tabanan',
-      'kategori': 'Maju'
-    },
-    {
-      'id': 2,
-      'gambar': 'assets/images/ubud.png',
-      'nama': 'Desa Wisata Ubud',
-      'kabupaten': 'Gianyar',
-      'deskripsi': 'deskripsi desa ubud',
-      'alamat': 'Ubud, Gianyar',
-      'kategori': 'Mandiri'
-    },
-  ];
-
-  List<DesaWisata> get desaWisataList {
-    return destinations.map((destination) {
-      return DesaWisata(
-        id: destination['id'],
-        gambar: destination['gambar'],
-        nama: destination['nama'],
-        deskripsi: destination['deskripsi'],
-        kabupaten: destination['kabupaten'],
-        alamat: destination['alamat'],
-        kategori: destination['kategori'],
-      );
-    }).toList();
+  @override
+  void initState() {
+    super.initState();
+    futureDesaWisataList =
+        ApiService().fetchDesaWisataList(''); // Replace with your actual token
   }
 
-  List<DesaWisata> get filteredDesaWisata {
-    return desaWisataList.where((desa) {
+  List<DesaWisata> getFilteredDesaWisata(List<DesaWisata> desaList) {
+    return desaList.where((desa) {
       bool matchesCategory = selectedCategory == 'Semua' ||
           (selectedCategory == 'Kabupaten'
               ? true
@@ -87,7 +65,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Desa Wisata',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -100,7 +78,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Kotak Pencarian
+            // Search Box
             Container(
               height: 50,
               decoration: BoxDecoration(
@@ -113,8 +91,8 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: InputDecoration(
-                  hintText: 'Cari',
+                decoration: const InputDecoration(
+                  hintText: 'Search',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                   contentPadding:
@@ -122,8 +100,8 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
-            // Filter Berdasarkan Kategori
+            const SizedBox(height: 16.0),
+            // Filter by Category
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -132,9 +110,9 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: ChoiceChip(
                       label: Text(category),
-                      labelStyle: TextStyle(color: Colors.black),
+                      labelStyle: const TextStyle(color: Colors.black),
                       backgroundColor: Colors.grey[200],
-                      selectedColor: Color.fromARGB(255, 172, 241, 244),
+                      selectedColor: const Color.fromARGB(255, 172, 241, 244),
                       selected: selectedCategory == category,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
@@ -153,12 +131,12 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                 }).toList(),
               ),
             ),
-            // Dropdown saat kabupaten dipilih
+            // Dropdown for Kabupaten selection
             if (selectedCategory == 'Kabupaten')
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(25),
@@ -183,10 +161,23 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                 ),
               ),
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredDesaWisata.length,
-                itemBuilder: (context, index) {
-                  return _buildDestinationCard(filteredDesaWisata[index]);
+              child: FutureBuilder<List<DesaWisata>>(
+                future: futureDesaWisataList,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    List<DesaWisata> filteredDesaList =
+                        getFilteredDesaWisata(snapshot.data ?? []);
+                    return ListView.builder(
+                      itemCount: filteredDesaList.length,
+                      itemBuilder: (context, index) {
+                        return _buildDestinationCard(filteredDesaList[index]);
+                      },
+                    );
+                  }
                 },
               ),
             ),
@@ -219,15 +210,15 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                 color: Colors.grey.withOpacity(0.2),
                 spreadRadius: 2,
                 blurRadius: 7,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                desa.gambar,
+              child: Image.network(
+                "http://192.168.43.155:3000/resource/desawisata/${desa.gambar}",
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,

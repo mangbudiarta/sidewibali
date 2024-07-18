@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'detailberita_page.dart';
 
 class Berita {
   final String judul;
@@ -18,6 +17,8 @@ class Berita {
 }
 
 class BeritaPage extends StatefulWidget {
+  const BeritaPage({super.key});
+
   @override
   _BeritaPageState createState() => _BeritaPageState();
 }
@@ -73,7 +74,7 @@ class _BeritaPageState extends State<BeritaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Berita',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -82,7 +83,7 @@ class _BeritaPageState extends State<BeritaPage> {
         foregroundColor: Colors.black,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -99,7 +100,7 @@ class _BeritaPageState extends State<BeritaPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Cari Berita',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
@@ -108,7 +109,7 @@ class _BeritaPageState extends State<BeritaPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Expanded(
               child: ListView.builder(
                 itemCount: filteredList.length,
@@ -137,7 +138,7 @@ class _BeritaPageState extends State<BeritaPage> {
                               color: Colors.grey.withOpacity(0.2),
                               spreadRadius: 2,
                               blurRadius: 7,
-                              offset: Offset(0, 3),
+                              offset: const Offset(0, 3),
                             ),
                           ],
                         ),
@@ -157,10 +158,10 @@ class _BeritaPageState extends State<BeritaPage> {
                               left: 0,
                               right: 0,
                               child: Container(
-                                padding: EdgeInsets.all(8),
+                                padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: Colors.black.withOpacity(0.3),
-                                  borderRadius: BorderRadius.only(
+                                  borderRadius: const BorderRadius.only(
                                     bottomLeft: Radius.circular(20),
                                     bottomRight: Radius.circular(20),
                                   ),
@@ -169,7 +170,7 @@ class _BeritaPageState extends State<BeritaPage> {
                                   berita.judul.length > 50
                                       ? '${berita.judul.substring(0, 50)}...'
                                       : berita.judul,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold,
@@ -196,7 +197,7 @@ class DetailBerita extends StatelessWidget {
   final Berita berita;
   final Map<int, String> desaMap;
 
-  DetailBerita({required this.berita, required this.desaMap});
+  const DetailBerita({super.key, required this.berita, required this.desaMap});
 
   @override
   Widget build(BuildContext context) {
@@ -210,20 +211,20 @@ class DetailBerita extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.asset(berita.gambar),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Text(
               berita.judul,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
             Text(
               'Desa: ${desaMap[berita.id_desawisata]}',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Text(
               berita.isi_berita,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),

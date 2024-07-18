@@ -3,6 +3,8 @@ import 'package:sidewibali/views/detaildestinasi_page.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
 
 class DestinasiPage extends StatefulWidget {
+  const DestinasiPage({super.key});
+
   @override
   _SearchPageStateDestinasi createState() => _SearchPageStateDestinasi();
 }
@@ -61,7 +63,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Destinasi Wisata',
+        title: const Text('Destinasi Wisata',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -85,7 +87,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Cari',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
@@ -94,7 +96,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             // Filter Berdasarkan Kategori
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -104,9 +106,9 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: ChoiceChip(
                       label: Text(category),
-                      labelStyle: TextStyle(color: Colors.black),
+                      labelStyle: const TextStyle(color: Colors.black),
                       backgroundColor: Colors.grey[200],
-                      selectedColor: Color.fromARGB(255, 172, 241, 244),
+                      selectedColor: const Color.fromARGB(255, 172, 241, 244),
                       selected: selectedCategory == category,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
@@ -158,7 +160,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
                 color: Colors.grey.withOpacity(0.2),
                 spreadRadius: 2,
                 blurRadius: 7,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),

@@ -4,6 +4,8 @@ import 'package:sidewibali/models/desa_model.dart';
 import 'package:sidewibali/views/detailproduk_page.dart';
 
 class ProdukPage extends StatefulWidget {
+  const ProdukPage({super.key});
+
   @override
   _ProdukPageState createState() => _ProdukPageState();
 }
@@ -82,7 +84,7 @@ class _ProdukPageState extends State<ProdukPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Produk',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -108,7 +110,7 @@ class _ProdukPageState extends State<ProdukPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Cari',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
@@ -117,7 +119,7 @@ class _ProdukPageState extends State<ProdukPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Expanded(
               child: ListView.builder(
                 itemCount: filteredProduk.length,
@@ -152,7 +154,7 @@ class CardProduk extends StatelessWidget {
   final String Function(int) getDesaNama;
   final VoidCallback onTap;
 
-  CardProduk({
+  const CardProduk({super.key, 
     required this.produk,
     required this.getDesaNama,
     required this.onTap,
@@ -173,7 +175,7 @@ class CardProduk extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.2),
                 spreadRadius: 2,
                 blurRadius: 7,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),

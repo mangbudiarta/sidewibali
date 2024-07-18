@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class FavoritePage extends StatefulWidget {
+  const FavoritePage({super.key});
+
   @override
   _FavoritePageState createState() => _FavoritePageState();
 }
@@ -28,7 +30,7 @@ class _FavoritePageState extends State<FavoritePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorit'),
+        title: const Text('Favorit'),
         centerTitle: true,
       ),
       body: ListView.builder(
@@ -39,7 +41,7 @@ class _FavoritePageState extends State<FavoritePage> {
               // Implement onTap action if needed
             },
             child: Card(
-              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -49,7 +51,7 @@ class _FavoritePageState extends State<FavoritePage> {
                 children: [
                   ClipRRect(
                     borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(10)),
+                        const BorderRadius.vertical(top: Radius.circular(10)),
                     child: Stack(
                       children: [
                         Image.asset(
@@ -71,7 +73,7 @@ class _FavoritePageState extends State<FavoritePage> {
                             child: Container(
                               width: 40,
                               height: 40,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.white,
                               ),
@@ -90,10 +92,10 @@ class _FavoritePageState extends State<FavoritePage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     child: Text(
                       favoriteDestinations[index].name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),

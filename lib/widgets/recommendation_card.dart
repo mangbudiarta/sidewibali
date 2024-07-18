@@ -5,7 +5,7 @@ class RecommendationCard extends StatelessWidget {
   final String nama;
   final String id_desawisata;
 
-  RecommendationCard({
+  const RecommendationCard({super.key, 
     required this.gambar,
     required this.nama,
     required this.id_desawisata,
@@ -24,7 +24,7 @@ class RecommendationCard extends StatelessWidget {
               color: Colors.grey.withOpacity(0.2),
               spreadRadius: 2,
               blurRadius: 7,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -41,26 +41,26 @@ class RecommendationCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(width: 12.0),
+              const SizedBox(width: 12.0),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 4.0),
+                    const SizedBox(height: 4.0),
                     Text(
                       nama,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 16.0, color: Colors.grey),
-                        SizedBox(width: 4.0),
+                        const Icon(Icons.location_on, size: 16.0, color: Colors.grey),
+                        const SizedBox(width: 4.0),
                         Text(id_desawisata,
-                            style: TextStyle(color: Colors.grey)),
+                            style: const TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ],

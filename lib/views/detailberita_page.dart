@@ -4,7 +4,7 @@ import 'package:sidewibali/models/berita_model.dart';
 class DetailBerita extends StatelessWidget {
   final Berita berita;
 
-  DetailBerita({required this.berita});
+  const DetailBerita({super.key, required this.berita});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class DetailBerita extends StatelessWidget {
                   top: 16,
                   left: 16,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -39,7 +39,7 @@ class DetailBerita extends StatelessWidget {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -53,18 +53,18 @@ class DetailBerita extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
                     berita.judul,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     berita.isi_berita,
-                    style: TextStyle(fontSize: 16.0),
+                    style: const TextStyle(fontSize: 16.0),
                   ),
                 ],
               ),
