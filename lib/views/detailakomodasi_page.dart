@@ -42,9 +42,8 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
-                      'assets/default_image.png',
-                      width: 80,
-                      height: 80,
+                      'assets/images/default_image.png',
+                      height: 400,
                       fit: BoxFit.cover,
                     );
                   },
