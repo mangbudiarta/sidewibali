@@ -5,6 +5,7 @@ import 'package:sidewibali/models/desawisata_model.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
 import 'package:sidewibali/models/informasi_model.dart';
 import 'package:sidewibali/models/kategoridestinasi_model.dart';
+import 'package:sidewibali/models/review_model.dart';
 import 'dart:convert';
 import '../models/user_model.dart';
 
@@ -294,6 +295,20 @@ class ApiService {
       return kategori.nama;
     } catch (e) {
       return 'kategori Tidak Diketahui';
+    }
+  }
+
+  Future<List<ReviewDestinasi>> fetchReviewsDestinasi(int destinasiId) async {
+    final response = await http
+        .get(Uri.parse('$_baseUrl/reviewdestinasi/destinasi/$destinasiId'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse
+          .map((review) => ReviewDestinasi.fromJson(review))
+          .toList();
+    } else {
+      throw Exception('Failed to load reviews');
     }
   }
 }

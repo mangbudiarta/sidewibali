@@ -186,7 +186,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
-                    'assets/default_image.png',
+                    'assets/images/default_image.png',
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
-import 'package:sidewibali/services/api_service.dart'; // pastikan path ini benar
+import 'package:sidewibali/models/review_model.dart';
+import 'package:sidewibali/services/api_service.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class DetailDestinasi extends StatefulWidget {
   final Destinasi destinasi;
@@ -20,6 +23,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
   bool isLiked = false;
   String desaName = '';
   String categoryName = '';
+  late Future<List<ReviewDestinasi>> futureReview;
 
   void _toggleLike() {
     setState(() {
@@ -32,6 +36,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
   void initState() {
     super.initState();
     _fetchDesaAndCategoryNames();
+    futureReview = ApiService().fetchReviewsDestinasi(widget.destinasi.id);
   }
 
   Future<void> _fetchDesaAndCategoryNames() async {
@@ -44,6 +49,17 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
       this.desaName = desaName;
       this.categoryName = categoryName;
     });
+  }
+
+  Future<Map<String, dynamic>?> _getAccountDetails(int userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      return await ApiService.getAccountDetails(userId, token);
+    } else {
+      print('Token tidak ditemukan');
+      return null;
+    }
   }
 
   @override
@@ -59,6 +75,13 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                   widget.destinasi.gambar,
                   height: 400,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/default_image.png',
+                      height: 400,
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
                 Positioned(
                   top: 16,
@@ -124,9 +147,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: Text(
-                          categoryName,
-                        ),
+                        child: Text(categoryName),
                       ),
                       const Spacer(),
                     ],
@@ -191,86 +212,93 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Review(
-                    username: 'Agus Prianta',
-                    rating: 4,
-                    comment: 'Suasana yang sejuk dan indah',
-                  ),
-                  const Review(
-                    username: 'Dodek Alit',
-                    rating: 5,
-                    comment:
-                        'Nyaman banget tempatnya, bagus untuk piknik keluarga, pokoknya rekomen banget',
-                  ),
-                  const Review(
-                    username: 'Ni Wayan Sari',
-                    rating: 5,
-                    comment: 'Tempat yang sangat nyaman untuk bersantai.',
-                  ),
-                  const Review(
-                    username: 'Made Sudana',
-                    rating: 3,
-                    comment: 'Cukup baik, tapi bisa lebih ditingkatkan lagi.',
+                  FutureBuilder<List<ReviewDestinasi>>(
+                    future: futureReview,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Text('Belum ada ulasan.');
+                      } else {
+                        final reviews = snapshot.data!;
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: reviews.length,
+                          itemBuilder: (context, index) {
+                            final review = reviews[index];
+                            return FutureBuilder<Map<String, dynamic>?>(
+                              future: _getAccountDetails(
+                                review.id_akun,
+                              ), // ganti dengan id user dari review
+                              builder: (context, userSnapshot) {
+                                if (userSnapshot.hasError) {
+                                  return Text('Error: ${userSnapshot.error}');
+                                } else if (!userSnapshot.hasData) {
+                                  return const Text('Akun tidak ditemukan.');
+                                } else {
+                                  final user = userSnapshot.data!;
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            user['foto'] ??
+                                                'https://via.placeholder.com/50',
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(user['nama'],
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  const SizedBox(width: 8),
+                                                  Row(
+                                                    children: List.generate(5,
+                                                        (index) {
+                                                      return Icon(
+                                                        index < review.rating
+                                                            ? Icons.star
+                                                            : Icons.star_border,
+                                                        color: Colors.amber,
+                                                        size: 16,
+                                                      );
+                                                    }),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(review.review),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class Review extends StatelessWidget {
-  final String username;
-  final int rating;
-  final String comment;
-
-  const Review({
-    super.key,
-    required this.username,
-    required this.rating,
-    required this.comment,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CircleAvatar(
-            backgroundImage: NetworkImage('https://via.placeholder.com/50'),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(username,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 8),
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Icon(
-                          index < rating ? Icons.star : Icons.star_border,
-                          color: Colors.amber,
-                          size: 16,
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(comment),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

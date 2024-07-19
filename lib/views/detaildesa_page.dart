@@ -137,9 +137,8 @@ class _DetailDesaState extends State<DetailDesa> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
-                      'assets/default_image.png',
-                      width: 80,
-                      height: 80,
+                      'assets/images/default_image.png',
+                      height: 400,
                       fit: BoxFit.cover,
                     );
                   },
@@ -432,9 +431,9 @@ class DesaCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
-                    'assets/default_image.png',
-                    width: 80,
-                    height: 80,
+                    'assets/images/default_image.png',
+                    height: 100,
+                    width: 150,
                     fit: BoxFit.cover,
                   );
                 },
@@ -492,9 +491,9 @@ class WisataCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
-                    'assets/default_image.png',
-                    width: 80,
-                    height: 80,
+                    'assets/images/default_image.png',
+                    height: 100,
+                    width: 150,
                     fit: BoxFit.cover,
                   );
                 },
@@ -551,9 +550,9 @@ class AkomodasiCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
-                    'assets/default_image.png',
-                    width: 80,
-                    height: 80,
+                    'assets/images/default_image.png',
+                    height: 100,
+                    width: 150,
                     fit: BoxFit.cover,
                   );
                 },
