@@ -1,6 +1,10 @@
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sidewibali/models/desa_model.dart';
+import 'package:sidewibali/models/akomodasi_model.dart';
+import 'package:sidewibali/models/desawisata_model.dart';
+import 'package:sidewibali/models/destinasi_model.dart';
+import 'package:sidewibali/models/informasi_model.dart';
+import 'package:sidewibali/models/kategoridestinasi_model.dart';
 import 'dart:convert';
 import '../models/user_model.dart';
 
@@ -126,27 +130,170 @@ class ApiService {
     return response;
   }
 
-  Future<List<DesaWisata>> fetchDesaWisataList(String token) async {
-    final Uri uri = Uri.parse('$_baseUrl/desawisata');
+  Future<List<DesaWisata>> fetchDesaWisataList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
+    final response = await http.get(
+      Uri.parse('$_baseUrl/desawisata'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => DesaWisata.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load desa wisata list');
+    }
+  }
+
+  Future<InformasiKontak> fetchInformasiKontak(int idDesaWisata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/informasi/$idDesaWisata'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return InformasiKontak.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load informasi kontak');
+    }
+  }
+
+  Future<List<Destinasi>> fetchDestinasiWisata(int idDesaWisata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/destinasiwisata/desa/$idDesaWisata'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => Destinasi.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load destinasi wisata');
+    }
+  }
+
+  Future<List<Akomodasi>> fetchAkomodasiList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/akomodasi'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => Akomodasi.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load akomodasi list');
+    }
+  }
+
+  Future<List<Akomodasi>> fetchAkomodasi(int idDesaWisata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/akomodasi/desa/$idDesaWisata'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => Akomodasi.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load akomodasi');
+    }
+  }
+
+  Future<String> fetchNamaDesa(int idDesa) async {
     try {
-      final response = await http.get(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
+      List<DesaWisata> desaWisataList = await fetchDesaWisataList();
+      final desa = desaWisataList.firstWhere(
+        (desa) => desa.id == idDesa,
+        orElse: () => DesaWisata(
+          id: -1,
+          gambar: '',
+          nama: 'Desa Tidak Diketahui',
+          kabupaten: '',
+          deskripsi: '',
+          alamat: '',
+          maps: '',
+          kategori: '',
+        ),
       );
-
-      if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(response.body);
-        List<DesaWisata> desaList =
-            data.map((item) => DesaWisata.fromJson(item)).toList();
-        return desaList;
-      } else {
-        throw Exception('Failed to load data');
-      }
+      return desa.nama;
     } catch (e) {
-      throw Exception('Error fetching data: $e');
+      return 'Desa Tidak Diketahui';
+    }
+  }
+
+  static Future<List<Destinasi>> fetchDestinations() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    final response = await http.get(
+      Uri.parse('$_baseUrl/destinasiwisata'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((item) => Destinasi.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load destinations');
+    }
+  }
+
+  Future<List<Kategori>> fetchKategoriDestinasi() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/kategoridestinasi'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => Kategori.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load kategori list');
+    }
+  }
+
+  Future<String> fetchKategoriDestinasiDetail(int idKategori) async {
+    try {
+      List<Kategori> kategoriDestinasi = await fetchKategoriDestinasi();
+      final kategori = kategoriDestinasi.firstWhere(
+        (kategori) => kategori.id == idKategori,
+        orElse: () => Kategori(
+          id: -1,
+          nama: 'kategori Tidak Diketahui',
+        ),
+      );
+      return kategori.nama;
+    } catch (e) {
+      return 'kategori Tidak Diketahui';
     }
   }
 }

@@ -51,6 +51,7 @@ class _HomePageState extends State<HomePage> {
 
   List<Destinasi> dummyRecommendedPlaces = [
     Destinasi(
+      id: 1,
       gambar: 'assets/images/beratan.png',
       nama: 'Danau Beratan',
       deskripsi:
@@ -59,6 +60,7 @@ class _HomePageState extends State<HomePage> {
       id_desawisata: 1,
     ),
     Destinasi(
+      id: 2,
       gambar: 'assets/images/ubud.png',
       nama: 'Puri Ubud',
       deskripsi:
@@ -67,6 +69,7 @@ class _HomePageState extends State<HomePage> {
       id_desawisata: 2,
     ),
     Destinasi(
+      id: 3,
       gambar: 'assets/images/kuta.png',
       nama: 'Kuta',
       deskripsi: 'Pantai terkenal dengan ombak dan kehidupan malamnya.',

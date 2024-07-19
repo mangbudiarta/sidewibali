@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sidewibali/models/produk_model.dart';
-import 'package:sidewibali/models/desa_model.dart';
+import 'package:sidewibali/models/desawisata_model.dart';
 import 'package:sidewibali/views/detailproduk_page.dart';
 
 class ProdukPage extends StatefulWidget {
@@ -44,6 +44,7 @@ List<DesaWisata> dummyDesaWisata = [
     alamat: 'Beraban, Tabanan',
     gambar: 'assets/images/kuta.png',
     deskripsi: 'deskripsi desa beraban',
+    maps: 'maps',
     kategori: 'berkembang',
     kabupaten: 'Tabanan',
   ),
@@ -53,6 +54,7 @@ List<DesaWisata> dummyDesaWisata = [
     alamat: 'Ubud, Gianyar',
     gambar: 'assets/images/ubud.png',
     deskripsi: 'deskripsi desa ubud',
+    maps: 'maps',
     kategori: 'maju',
     kabupaten: 'Gianyar',
   ),
@@ -62,6 +64,7 @@ List<DesaWisata> dummyDesaWisata = [
     alamat: 'Candikuning, Tabanan',
     gambar: 'assets/images/beratan.png',
     deskripsi: 'deskripsi desa candikuning',
+    maps: 'maps',
     kategori: 'mandiri',
     kabupaten: 'Tabanan',
   ),
@@ -154,7 +157,8 @@ class CardProduk extends StatelessWidget {
   final String Function(int) getDesaNama;
   final VoidCallback onTap;
 
-  const CardProduk({super.key, 
+  const CardProduk({
+    super.key,
     required this.produk,
     required this.getDesaNama,
     required this.onTap,

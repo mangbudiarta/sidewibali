@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
+import 'package:sidewibali/services/api_service.dart'; // pastikan path ini benar
 
 class DetailDestinasi extends StatefulWidget {
   final Destinasi destinasi;
 
-  const DetailDestinasi({super.key, required this.destinasi});
+  const DetailDestinasi({
+    super.key,
+    required this.destinasi,
+  });
 
   @override
   _DetailDestinasiState createState() => _DetailDestinasiState();
@@ -14,18 +18,8 @@ class DetailDestinasi extends StatefulWidget {
 class _DetailDestinasiState extends State<DetailDestinasi> {
   int likeCount = 120;
   bool isLiked = false;
-
-  final Map<int, String> categoryMap = {
-    1: 'Destinasi Wisata Air',
-    2: 'Destinasi Wisata Alam',
-    3: 'Destinasi Wisata Rekreasi'
-  };
-
-  final Map<int, String> desaMap = {
-    1: 'Desa Bedugul',
-    2: 'Desa Ubud',
-    3: 'Desa Kuta'
-  };
+  String desaName = '';
+  String categoryName = '';
 
   void _toggleLike() {
     setState(() {
@@ -34,12 +28,21 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
     });
   }
 
-  void _share() {
-    Clipboard.setData(const ClipboardData(text: "Link berbagi: https://google.com"))
-        .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Link telah disalin ke clipboard"),
-      ));
+  @override
+  void initState() {
+    super.initState();
+    _fetchDesaAndCategoryNames();
+  }
+
+  Future<void> _fetchDesaAndCategoryNames() async {
+    final desaName =
+        await ApiService().fetchNamaDesa(widget.destinasi.id_desawisata);
+    final categoryName = await ApiService()
+        .fetchKategoriDestinasiDetail(widget.destinasi.id_kategoridestinasi);
+
+    setState(() {
+      this.desaName = desaName;
+      this.categoryName = categoryName;
     });
   }
 
@@ -52,7 +55,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
           children: [
             Stack(
               children: [
-                Image.asset(
+                Image.network(
                   widget.destinasi.gambar,
                   height: 400,
                   fit: BoxFit.cover,
@@ -84,7 +87,8 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                   top: 16,
                   right: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
@@ -114,22 +118,17 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                   Row(
                     children: [
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Text(
-                          categoryMap[widget.destinasi.id_kategoridestinasi] ??
-                              'Kategori Tidak Diketahui',
+                          categoryName,
                         ),
                       ),
                       const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.share),
-                        onPressed: _share,
-                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -146,8 +145,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                       const Icon(Icons.location_on, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        desaMap[widget.destinasi.id_desawisata] ??
-                            'Desa Tidak Diketahui',
+                        desaName,
                         style: TextStyle(
                           color: Colors.grey[600],
                         ),
@@ -229,7 +227,12 @@ class Review extends StatelessWidget {
   final int rating;
   final String comment;
 
-  const Review({super.key, required this.username, required this.rating, required this.comment});
+  const Review({
+    super.key,
+    required this.username,
+    required this.rating,
+    required this.comment,
+  });
 
   @override
   Widget build(BuildContext context) {

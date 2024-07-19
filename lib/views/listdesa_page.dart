@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:sidewibali/models/desa_model.dart';
+import 'package:sidewibali/models/desawisata_model.dart';
 import 'package:sidewibali/views/detaildesa_page.dart';
 import 'package:sidewibali/services/api_service.dart';
 
@@ -41,8 +41,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
   @override
   void initState() {
     super.initState();
-    futureDesaWisataList =
-        ApiService().fetchDesaWisataList(''); // Replace with your actual token
+    futureDesaWisataList = ApiService().fetchDesaWisataList();
   }
 
   List<DesaWisata> getFilteredDesaWisata(List<DesaWisata> desaList) {
@@ -222,6 +221,14 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/default_image.png',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             ),
             title: Text(desa.nama),
