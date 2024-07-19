@@ -5,6 +5,7 @@ class DesaWisata {
   final String kabupaten;
   final String deskripsi;
   final String alamat;
+  final String maps;
   final String kategori;
 
   DesaWisata({
@@ -14,10 +15,10 @@ class DesaWisata {
     required this.kabupaten,
     required this.deskripsi,
     required this.alamat,
+    required this.maps,
     required this.kategori,
   });
 
-  // Add a factory constructor to convert JSON to DesaWisata object
   factory DesaWisata.fromJson(Map<String, dynamic> json) {
     return DesaWisata(
       id: json['id'],
@@ -27,6 +28,7 @@ class DesaWisata {
       deskripsi: json['deskripsi'],
       alamat: json['alamat'],
       kategori: json['kategori'],
+      maps: json['maps'],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sidewibali/models/akomodasi_model.dart';
+import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/views/detailakomodasi_page.dart';
 
 class AkomodasiPage extends StatefulWidget {
@@ -13,36 +14,35 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
   String selectedCategory = 'Semua';
   String searchQuery = '';
 
-  List<String> categories = [
-    'Semua',
-    'Hotel',
-    'Villa',
-    'Glamping',
-  ];
+  List<String> categories = ['Semua'];
+  List<Akomodasi> accommodations = [];
 
-  List<Akomodasi> accommodations = [
-    Akomodasi(
-      gambar:
-          'https://ik.imagekit.io/tvlk/apr-asset/dgXfoyh24ryQLRcGq00cIdKHRmotrWLNlvG-TxlcLxGkiDwaUSggleJNPRgIHCX6/hotel/asset/10000224-3110x2074-FIT_AND_TRIM-932c024ef643cbc080303dec6762c32a.jpeg?_src=imagekit&tr=c-at_max,f-jpg,h-360,pr-true,q-100,w-640',
-      nama: 'CLV Hotel And Villa',
-      kategori: 'Hotel',
-      id_desawisata: 1,
-    ),
-    Akomodasi(
-      gambar:
-          'https://cf.bstatic.com/xdata/images/hotel/max1024x768/432052930.jpg?k=f7a7b48e87279dbc36822bc186d7d19c4c0867421aa1e72cfc0bed1898b727fb&o=&hp=1',
-      nama: 'Diamond Glamping Bedugul',
-      kategori: 'Glamping',
-      id_desawisata: 2,
-    ),
-    Akomodasi(
-      gambar:
-          'https://cf2.bstatic.com/xdata/images/hotel/max1280x900/335858204.jpg?k=5f6312589836fe276b5c2cdfb87998b6054a7018a59d4ce4a4e3ca1d9c00d548&o=&hp=1',
-      nama: 'Vila Sinta',
-      kategori: 'Villa',
-      id_desawisata: 1,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final apiService = ApiService();
+      final fetchedAccommodations = await apiService.fetchAkomodasiList();
+
+      // Extract unique categories
+      final uniqueCategories = <String>{};
+      for (var accommodation in fetchedAccommodations) {
+        uniqueCategories.add(accommodation.kategori);
+      }
+
+      setState(() {
+        accommodations = fetchedAccommodations;
+        categories = ['Semua', ...uniqueCategories.toList()];
+      });
+    } catch (e) {
+      // Handle error (e.g., show an alert)
+      print('Error loading data: $e');
+    }
+  }
 
   List<Akomodasi> get filteredAccommodations {
     return accommodations.where((accommodation) {
@@ -121,10 +121,25 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredAccommodations.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return _buildAccommodationCard(filteredAccommodations[index]);
+              child: FutureBuilder<List<Akomodasi>>(
+                future: ApiService().fetchAkomodasiList(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Failed to load data'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No data available'));
+                  } else {
+                    accommodations = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: filteredAccommodations.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return _buildAccommodationCard(
+                            filteredAccommodations[index]);
+                      },
+                    );
+                  }
                 },
               ),
             ),
@@ -165,10 +180,18 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                accommodation.gambar,
+                "http://192.168.43.155:3000/resource/akomodasi/${accommodation.gambar}",
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/default_image.png',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             ),
             title: Text(accommodation.nama),

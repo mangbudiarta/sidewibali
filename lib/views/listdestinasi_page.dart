@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
+import 'package:sidewibali/services/api_service.dart';
 
 class DestinasiPage extends StatefulWidget {
   const DestinasiPage({super.key});
@@ -13,41 +14,46 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
   String selectedCategory = 'Semua';
   String searchQuery = '';
 
-  List<String> categories = [
-    'Semua',
-    'Destinasi Wisata Air',
-    'Destinasi Wisata Alam',
-    'Destinasi Wisata Rekreasi'
-  ];
+  List<String> categories = ['Semua'];
+  Map<int, String> categoryMap = {};
+  Map<int, String> desaMap = {};
+  List<Destinasi> destinations = [];
 
-  Map<int, String> categoryMap = {
-    1: 'Destinasi Wisata Air',
-    2: 'Destinasi Wisata Alam',
-    3: 'Destinasi Wisata Rekreasi'
-  };
+  @override
+  void initState() {
+    super.initState();
+    _fetchDestinations();
+    _fetchDesaNames();
+    _fetchCategories();
+  }
 
-  Map<int, String> desaMap = {
-    1: 'Desa Bedugul',
-    2: 'Desa Ubud',
-    3: 'Desa Kuta'
-  };
+  Future<void> _fetchDestinations() async {
+    final destinations = await ApiService.fetchDestinations();
+    setState(() {
+      this.destinations = destinations;
+    });
+  }
 
-  List<Destinasi> destinations = [
-    Destinasi(
-      gambar: 'assets/images/beratan.png',
-      nama: 'Destinasi Wisata Ulun Danu Beratan',
-      deskripsi: 'Deskripsi dari Destinasi Wisata Ulun Danu Beratan',
-      id_kategoridestinasi: 1,
-      id_desawisata: 1,
-    ),
-    Destinasi(
-      gambar: 'assets/images/ubud.png',
-      nama: 'Destinasi Wisata Budaya',
-      deskripsi: 'Deskripsi dari Destinasi Wisata Budaya',
-      id_kategoridestinasi: 2,
-      id_desawisata: 2,
-    ),
-  ];
+  Future<void> _fetchDesaNames() async {
+    final apiService = ApiService();
+    final desaWisataList = await apiService.fetchDesaWisataList();
+    setState(() {
+      desaMap = {for (var item in desaWisataList) item.id: item.nama};
+    });
+  }
+
+  Future<void> _fetchCategories() async {
+    final apiService = ApiService();
+    final kategoriList = await apiService.fetchKategoriDestinasi();
+    setState(() {
+      categories = ['Semua'];
+      categoryMap = {};
+      for (var kategori in kategoriList) {
+        categories.add(kategori.nama);
+        categoryMap[kategori.id] = kategori.nama;
+      }
+    });
+  }
 
   List<Destinasi> get filteredDestinations {
     return destinations.where((destination) {
@@ -115,7 +121,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
                       ),
                       onSelected: (bool selected) {
                         setState(() {
-                          selectedCategory = selected ? category : 'All';
+                          selectedCategory = selected ? category : 'Semua';
                         });
                       },
                     ),
@@ -167,8 +173,8 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
           child: ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                destination.gambar,
+              child: Image.network(
+                'http://192.168.43.155:3000/resource/destinasiwisata/${destination.gambar}',
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
