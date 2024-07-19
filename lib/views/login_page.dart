@@ -1,42 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/forgotpass_page.dart';
 import 'package:sidewibali/views/registrasi_page.dart';
 import 'package:sidewibali/views/home_page.dart';
 import 'package:sidewibali/services/api_service.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   State<LoginView> createState() => _LoginViewState();
 }
 
 class _LoginViewState extends State<LoginView> {
-  bool _keepSignedIn = false;
   bool _isPasswordVisible = false;
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Future<void> _login() async {
     if (_formKey.currentState?.validate() ?? false) {
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
 
-      var result = await ApiService.loginUser(email, password);
+      try {
+        var result = await ApiService.loginUser(email, password);
 
-      if (result['success']) {
+        if (result['success']) {
+          String token = result['data'];
+
+          // Simpan token menggunakan shared_preferences
+          SharedPreferences preferences = await SharedPreferences.getInstance();
+          await preferences.setString('token', token);
+
+          Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+          int userId = decodedToken['id'];
+
+          // Panggil API untuk mendapatkan detail user
+          var userDetails = await ApiService.getAccountDetails(userId, token);
+
+          if (userDetails != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Login successful!')),
+            );
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(userDetails: userDetails),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('User details are null')),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: ${result['message']}')),
+          );
+        }
+      } catch (e) {
+        print('Error during login: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login successful!')),
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${result['message']}')),
+          SnackBar(content: Text('An error occurred: $e')),
         );
       }
     }
@@ -53,7 +82,7 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
                 Center(
                   child: Image.asset(
                     'assets/images/logo_text_max.png',
@@ -61,7 +90,7 @@ class _LoginViewState extends State<LoginView> {
                     height: 100,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: Text(
                     "Welcome Back!",
@@ -72,7 +101,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -80,13 +109,11 @@ class _LoginViewState extends State<LoginView> {
                     labelText: "Email",
                     hintText: "Enter your email",
                     contentPadding:
-                        EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                        const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
-                  // validasi inputan
-
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -97,7 +124,7 @@ class _LoginViewState extends State<LoginView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
@@ -105,7 +132,7 @@ class _LoginViewState extends State<LoginView> {
                     labelText: "Password",
                     hintText: "Enter your password",
                     contentPadding:
-                        EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                        const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -125,8 +152,6 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                   ),
-                  // validasi inputan
-
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -134,80 +159,53 @@ class _LoginViewState extends State<LoginView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _keepSignedIn,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              _keepSignedIn = value ?? false;
-                            });
-                          },
-                        ),
-                        Text("Keep me signed in"),
-                      ],
-                    ),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ForgotpassView(),
+                            builder: (context) => const ForgotpassView(),
                           ),
                         );
                       },
-                      child: Text("Forgot password?"),
+                      child: const Text("Forgot password?"),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primary,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: Text(
-                    "Login",
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  child: const Text("Login"),
                 ),
-                SizedBox(height: 20),
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account? ",
-                        style: TextStyle(fontFamily: "nunito_regular"),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RegisterView(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            fontFamily: "nunito_semibold",
-                            color: primary,
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account?"),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterView(),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
+                        );
+                      },
+                      child: const Text("Sign Up"),
+                    ),
+                  ],
                 ),
               ],
             ),

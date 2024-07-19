@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 class DetailDesa extends StatefulWidget {
   final DesaWisata desa;
 
-  DetailDesa({required this.desa});
+  const DetailDesa({super.key, required this.desa});
 
   @override
   _DetailDesaState createState() => _DetailDesaState();
@@ -24,9 +24,9 @@ class _DetailDesaState extends State<DetailDesa> {
   }
 
   void _share() {
-    Clipboard.setData(ClipboardData(text: "Link berbagi: https://google.com"))
+    Clipboard.setData(const ClipboardData(text: "Link berbagi: https://google.com"))
         .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Link telah disalin ke clipboard"),
       ));
     });
@@ -42,8 +42,8 @@ class _DetailDesaState extends State<DetailDesa> {
           children: [
             Stack(
               children: [
-                Image.asset(
-                  widget.desa.gambar,
+                Image.network(
+                  "http://192.168.43.155:3000/resource/desawisata/${widget.desa.gambar}",
                   height: 400,
                   fit: BoxFit.cover,
                 ),
@@ -51,7 +51,7 @@ class _DetailDesaState extends State<DetailDesa> {
                   top: 16,
                   left: 16,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -63,7 +63,7 @@ class _DetailDesaState extends State<DetailDesa> {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -74,7 +74,7 @@ class _DetailDesaState extends State<DetailDesa> {
                   top: 16,
                   right: 16,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
@@ -88,7 +88,7 @@ class _DetailDesaState extends State<DetailDesa> {
                           ),
                           onPressed: _toggleLike,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text('$likeCount Suka'),
                       ],
                     ),
@@ -105,47 +105,47 @@ class _DetailDesaState extends State<DetailDesa> {
                     children: [
                       Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Text(widget.desa.kategori),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       IconButton(
-                        icon: Icon(Icons.share),
+                        icon: const Icon(Icons.share),
                         onPressed: _share,
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     widget.desa.nama,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.grey, size: 20),
-                      SizedBox(width: 4),
+                      const Icon(Icons.location_on, color: Colors.grey, size: 20),
+                      const SizedBox(width: 4),
                       Text(
                         'Kabupaten ${widget.desa.kabupaten}',
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
-                  Row(
+                  const SizedBox(height: 16),
+                  const Row(
                     children: [
-                      Expanded(
+                      Flexible(
                         child: BarisInfoKontak(
                           icon: Icons.phone,
                           text: '083 123 123 123',
                         ),
                       ),
                       SizedBox(width: 16),
-                      Expanded(
+                      Flexible(
                         child: BarisInfoKontak(
                           icon: Icons.email,
                           text: 'admin@candikuning.id',
@@ -153,17 +153,17 @@ class _DetailDesaState extends State<DetailDesa> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
-                  Row(
+                  const SizedBox(height: 8),
+                  const Row(
                     children: [
-                      Expanded(
+                      Flexible(
                         child: BarisInfoKontak(
                           icon: Icons.web,
                           text: 'candikuning.id',
                         ),
                       ),
                       SizedBox(width: 16),
-                      Expanded(
+                      Flexible(
                         child: BarisInfoKontak(
                           icon: Icons.photo_camera,
                           text: '@desacandikuning',
@@ -171,40 +171,40 @@ class _DetailDesaState extends State<DetailDesa> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Deskripsi',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     widget.desa.deskripsi,
                     textAlign: TextAlign.justify,
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Lokasi',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () {
                       launchMaps();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 2, 215, 208),
+                      backgroundColor: const Color.fromARGB(255, 2, 215, 208),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                       padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      textStyle: TextStyle(fontWeight: FontWeight.w500),
+                          const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w500),
                     ),
-                    child: Text('Buka Maps'),
+                    child: const Text('Buka Maps'),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Destinasi Wisata',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -212,7 +212,7 @@ class _DetailDesaState extends State<DetailDesa> {
                     height: 150,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: [
+                      children: const [
                         WisataCard(
                           imageUrl:
                               'https://www.rentalmobilbali.net/wp-content/uploads/2021/12/Bali-Botanic-Garden.jpg',
@@ -235,8 +235,8 @@ class _DetailDesaState extends State<DetailDesa> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Akomodasi',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -244,7 +244,7 @@ class _DetailDesaState extends State<DetailDesa> {
                     height: 150,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: [
+                      children: const [
                         WisataCard(
                           imageUrl: 'assets/images/beratan.png',
                           title: 'Hotel De Danau Lake View',
@@ -271,8 +271,8 @@ class _DetailDesaState extends State<DetailDesa> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Desa Wisata Lainnya',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -280,7 +280,7 @@ class _DetailDesaState extends State<DetailDesa> {
                     height: 150,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: [
+                      children: const [
                         WisataCard(
                           imageUrl:
                               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpyWgTHCmZBIbI4jUf8sNRKFGP3QeMzhJB-Q&s',
@@ -331,12 +331,12 @@ class WisataCard extends StatelessWidget {
   final String imageUrl;
   final String title;
 
-  WisataCard({required this.imageUrl, required this.title});
+  const WisataCard({super.key, required this.imageUrl, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       width: 150,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,10 +351,12 @@ class WisataCard extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -366,15 +368,20 @@ class BarisInfoKontak extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  BarisInfoKontak({required this.icon, required this.text});
+  const BarisInfoKontak({super.key, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Icon(icon, size: 24),
-        SizedBox(width: 8),
-        Text(text),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            softWrap: true,
+          ),
+        ),
       ],
     );
   }

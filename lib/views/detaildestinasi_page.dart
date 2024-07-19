@@ -5,7 +5,7 @@ import 'package:sidewibali/models/destinasi_model.dart';
 class DetailDestinasi extends StatefulWidget {
   final Destinasi destinasi;
 
-  DetailDestinasi({required this.destinasi});
+  const DetailDestinasi({super.key, required this.destinasi});
 
   @override
   _DetailDestinasiState createState() => _DetailDestinasiState();
@@ -35,9 +35,9 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
   }
 
   void _share() {
-    Clipboard.setData(ClipboardData(text: "Link berbagi: https://google.com"))
+    Clipboard.setData(const ClipboardData(text: "Link berbagi: https://google.com"))
         .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Link telah disalin ke clipboard"),
       ));
     });
@@ -61,7 +61,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                   top: 16,
                   left: 16,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -73,7 +73,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -84,7 +84,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                   top: 16,
                   right: 16,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
@@ -98,7 +98,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                           ),
                           onPressed: _toggleLike,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text('$likeCount Suka'),
                       ],
                     ),
@@ -115,7 +115,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                     children: [
                       Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(30),
@@ -125,26 +125,26 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                               'Kategori Tidak Diketahui',
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       IconButton(
-                        icon: Icon(Icons.share),
+                        icon: const Icon(Icons.share),
                         onPressed: _share,
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     widget.destinasi.nama,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.grey),
-                      SizedBox(width: 4),
+                      const Icon(Icons.location_on, color: Colors.grey),
+                      const SizedBox(width: 4),
                       Text(
                         desaMap[widget.destinasi.id_desawisata] ??
                             'Desa Tidak Diketahui',
@@ -154,26 +154,26 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Deskripsi',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(widget.destinasi.deskripsi),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Rating',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Row(
+                  const SizedBox(height: 4),
+                  const Row(
                     children: [
                       Icon(Icons.star, color: Colors.amber),
                       Icon(Icons.star, color: Colors.amber),
@@ -184,32 +184,32 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                       Text('4/5 (49 Penilaian)'),
                     ],
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Ulasan',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Review(
+                  const SizedBox(height: 4),
+                  const Review(
                     username: 'Agus Prianta',
                     rating: 4,
                     comment: 'Suasana yang sejuk dan indah',
                   ),
-                  Review(
+                  const Review(
                     username: 'Dodek Alit',
                     rating: 5,
                     comment:
                         'Nyaman banget tempatnya, bagus untuk piknik keluarga, pokoknya rekomen banget',
                   ),
-                  Review(
+                  const Review(
                     username: 'Ni Wayan Sari',
                     rating: 5,
                     comment: 'Tempat yang sangat nyaman untuk bersantai.',
                   ),
-                  Review(
+                  const Review(
                     username: 'Made Sudana',
                     rating: 3,
                     comment: 'Cukup baik, tapi bisa lebih ditingkatkan lagi.',
@@ -229,7 +229,7 @@ class Review extends StatelessWidget {
   final int rating;
   final String comment;
 
-  Review({required this.username, required this.rating, required this.comment});
+  const Review({super.key, required this.username, required this.rating, required this.comment});
 
   @override
   Widget build(BuildContext context) {
@@ -238,10 +238,10 @@ class Review extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             backgroundImage: NetworkImage('https://via.placeholder.com/50'),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,8 +249,8 @@ class Review extends StatelessWidget {
                 Row(
                   children: [
                     Text(username,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    SizedBox(width: 8),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 8),
                     Row(
                       children: List.generate(5, (index) {
                         return Icon(
@@ -262,7 +262,7 @@ class Review extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(comment),
               ],
             ),

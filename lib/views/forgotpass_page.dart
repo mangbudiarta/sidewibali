@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:sidewibali/utils/colors.dart';
 
 class ForgotpassView extends StatelessWidget {
+  const ForgotpassView({super.key});
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Forgot Password'),
+        title: const Text('Forgot Password'),
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -23,7 +25,7 @@ class ForgotpassView extends StatelessWidget {
                   'assets/images/logo_text_max.png',
                   height: 100,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   'Forgot Password',
                   style: TextStyle(
@@ -32,7 +34,7 @@ class ForgotpassView extends StatelessWidget {
                     color: primary,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -41,7 +43,7 @@ class ForgotpassView extends StatelessWidget {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       vertical: 16,
                       horizontal: 20,
                     ),
@@ -57,19 +59,19 @@ class ForgotpassView extends StatelessWidget {
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
+                      if (formKey.currentState?.validate() ?? false) {
                         String email = emailController.text.trim();
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 18,
                       ),
@@ -77,7 +79,7 @@ class ForgotpassView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Kirim',
                       style: TextStyle(fontSize: 16),
                     ),

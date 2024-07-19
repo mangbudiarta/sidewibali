@@ -4,7 +4,7 @@ import 'package:sidewibali/models/paketwisata_model.dart';
 class DetailPaketwisata extends StatelessWidget {
   final PaketWisata paketWisata;
 
-  DetailPaketwisata({required this.paketWisata});
+  DetailPaketwisata({super.key, required this.paketWisata});
 
   final Map<int, String> desaMap = {
     1: 'Desa Bedugul',
@@ -31,7 +31,7 @@ class DetailPaketwisata extends StatelessWidget {
                   top: 16,
                   left: 16,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -43,7 +43,7 @@ class DetailPaketwisata extends StatelessWidget {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -62,14 +62,14 @@ class DetailPaketwisata extends StatelessWidget {
                     children: [
                       Text(
                         paketWisata.nama,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         'Rp${paketWisata.harga}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -79,8 +79,8 @@ class DetailPaketwisata extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.grey),
-                      SizedBox(width: 4),
+                      const Icon(Icons.location_on, color: Colors.grey),
+                      const SizedBox(width: 4),
                       Text(
                         desaMap[int.parse(paketWisata.id_desawisata)] ??
                             'Desa Tidak Diketahui',
@@ -91,10 +91,10 @@ class DetailPaketwisata extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     paketWisata.deskripsi,
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ],
               ),

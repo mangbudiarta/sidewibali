@@ -10,6 +10,7 @@ import 'package:sidewibali/views/listproduk_page.dart';
 import 'package:sidewibali/views/listulasan_page.dart';
 import 'package:sidewibali/views/listberita_page.dart';
 import 'package:sidewibali/views/listakomodasi_page.dart';
+import 'package:sidewibali/views/login_page.dart';
 import 'package:sidewibali/widgets/recommendation_card.dart';
 import 'package:sidewibali/views/favorite_page.dart';
 import 'package:sidewibali/views/notification_page.dart';
@@ -18,7 +19,8 @@ import 'package:sidewibali/views/website_page.dart';
 import 'package:sidewibali/widgets/menu_item.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final Map<String, dynamic> userDetails;
+  const HomePage({super.key, required this.userDetails});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -80,12 +82,28 @@ class _HomePageState extends State<HomePage> {
     _recommendedPlaces = dummyRecommendedPlaces;
   }
 
-  static List<Widget> _widgetOptions = <Widget>[
-    MainPage(),
-    FavoritePage(),
-    NotificationPage(),
-    ProfilPage(),
-  ];
+  List<Widget> _widgetOptions(Map<String, dynamic> userDetails) {
+    bool isLoggedIn = userDetails.containsKey('id') &&
+        userDetails['id'] != null &&
+        userDetails.containsKey('token') &&
+        userDetails['token'] != null;
+
+    if (isLoggedIn) {
+      return <Widget>[
+        const MainPage(),
+        const FavoritePage(),
+        const NotificationPage(),
+        ProfilPage(userDetails: userDetails),
+      ];
+    } else {
+      return <Widget>[
+        const MainPage(),
+        const LoginView(),
+        const LoginView(),
+        const LoginView(),
+      ];
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -120,7 +138,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: _widgetOptions(widget.userDetails).elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: primary,
@@ -151,10 +169,12 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MainPage extends StatelessWidget {
+  const MainPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
-    final _homePageState = context.findAncestorStateOfType<_HomePageState>();
+    final homePageState = context.findAncestorStateOfType<_HomePageState>();
 
     return SingleChildScrollView(
       child: Column(
@@ -172,12 +192,12 @@ class MainPage extends StatelessWidget {
                 aspectRatio: 16 / 9,
                 enlargeCenterPage: true,
               ),
-              items: _homePageState!._carouselImages.map((i) {
+              items: homePageState!._carouselImages.map((i) {
                 return Builder(
                   builder: (BuildContext context) {
                     return Container(
                       width: screenSize.width,
-                      margin: EdgeInsets.symmetric(horizontal: 5.0),
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
                         image: DecorationImage(
@@ -199,9 +219,9 @@ class MainPage extends StatelessWidget {
             child: GridView.count(
               crossAxisCount: 4,
               childAspectRatio: 1.0,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              children: [
+              children: const [
                 MenuItem('Desa Wisata', 'assets/icons/desawisata.png',
                     DesaWisataPage()),
                 MenuItem(
@@ -236,7 +256,7 @@ class MainPage extends StatelessWidget {
                 ),
                 SizedBox(height: screenSize.height * 0.01),
                 Column(
-                  children: _homePageState._recommendedPlaces.map((place) {
+                  children: homePageState._recommendedPlaces.map((place) {
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -252,7 +272,7 @@ class MainPage extends StatelessWidget {
                         gambar: place.gambar,
                         nama: place.nama,
                         id_desawisata:
-                            _homePageState.desaMap[place.id_desawisata] ??
+                            homePageState.desaMap[place.id_desawisata] ??
                                 'Unknown',
                       ),
                     );

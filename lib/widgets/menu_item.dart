@@ -5,7 +5,7 @@ class MenuItem extends StatelessWidget {
   final String imagePath;
   final Widget page;
 
-  MenuItem(this.title, this.imagePath, this.page);
+  const MenuItem(this.title, this.imagePath, this.page, {super.key});
 
   @override
   Widget build(BuildContext context) {

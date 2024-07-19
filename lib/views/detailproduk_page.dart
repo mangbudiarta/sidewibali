@@ -4,7 +4,7 @@ import 'package:sidewibali/models/produk_model.dart';
 class DetailProduk extends StatelessWidget {
   final Produk produk;
 
-  DetailProduk({required this.produk});
+  DetailProduk({super.key, required this.produk});
 
   final Map<int, String> desaMap = {
     1: 'Desa Bedugul',
@@ -31,7 +31,7 @@ class DetailProduk extends StatelessWidget {
                   top: 16,
                   left: 16,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -43,7 +43,7 @@ class DetailProduk extends StatelessWidget {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -62,14 +62,14 @@ class DetailProduk extends StatelessWidget {
                     children: [
                       Text(
                         produk.nama,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         'Rp${produk.harga}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -79,8 +79,8 @@ class DetailProduk extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.grey),
-                      SizedBox(width: 4),
+                      const Icon(Icons.location_on, color: Colors.grey),
+                      const SizedBox(width: 4),
                       Text(
                         desaMap[int.parse(produk.id_desawisata)] ??
                             'Desa Tidak Diketahui',
@@ -91,10 +91,10 @@ class DetailProduk extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     produk.deskripsi,
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ],
               ),
