@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sidewibali/models/berita_model.dart';
 
 class DetailBerita extends StatelessWidget {
@@ -60,6 +61,11 @@ class DetailBerita extends StatelessWidget {
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    DateFormat('dd MMM yyyy').format(berita.timestamp),
+                    style: TextStyle(fontSize: 16.0, color: Colors.grey),
                   ),
                   SizedBox(height: 10),
                   Text(

@@ -1,21 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:sidewibali/models/berita_model.dart';
 import 'detailberita_page.dart';
-
-class Berita {
-  final String judul;
-  final String isi_berita;
-  final String gambar;
-  final int id_desawisata;
-  final DateTime timestamp;
-
-  Berita({
-    required this.judul,
-    required this.isi_berita,
-    required this.gambar,
-    required this.id_desawisata,
-    required this.timestamp,
-  });
-}
 
 class BeritaPage extends StatefulWidget {
   @override
@@ -121,7 +107,6 @@ class _BeritaPageState extends State<BeritaPage> {
                         MaterialPageRoute(
                           builder: (context) => DetailBerita(
                             berita: berita,
-                            desaMap: desaMap,
                           ),
                         ),
                       );
@@ -165,15 +150,28 @@ class _BeritaPageState extends State<BeritaPage> {
                                     bottomRight: Radius.circular(20),
                                   ),
                                 ),
-                                child: Text(
-                                  berita.judul.length > 50
-                                      ? '${berita.judul.substring(0, 50)}...'
-                                      : berita.judul,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      berita.judul.length > 50
+                                          ? '${berita.judul.substring(0, 50)}...'
+                                          : berita.judul,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat('dd MMM yyyy')
+                                          .format(berita.timestamp),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -184,46 +182,6 @@ class _BeritaPageState extends State<BeritaPage> {
                   );
                 },
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DetailBerita extends StatelessWidget {
-  final Berita berita;
-  final Map<int, String> desaMap;
-
-  DetailBerita({required this.berita, required this.desaMap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(berita.judul),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(berita.gambar),
-            SizedBox(height: 16.0),
-            Text(
-              berita.judul,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              'Desa: ${desaMap[berita.id_desawisata]}',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            SizedBox(height: 16.0),
-            Text(
-              berita.isi_berita,
-              style: TextStyle(fontSize: 16),
             ),
           ],
         ),

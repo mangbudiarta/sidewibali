@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
+import 'package:sidewibali/models/paketwisata_model.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
 import 'package:sidewibali/views/listdesa_page.dart';
@@ -16,6 +17,7 @@ import 'package:sidewibali/views/notification_page.dart';
 import 'package:sidewibali/views/profile_page.dart';
 import 'package:sidewibali/views/website_page.dart';
 import 'package:sidewibali/widgets/menu_item.dart';
+import 'package:sidewibali/views/detailpaketwisata.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -24,9 +26,22 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+// class PaketWisata {
+//   final String gambar;
+//   final String nama;
+//   final int harga;
+
+//   PaketWisata({
+//     required this.gambar,
+//     required this.nama,
+//     required this.harga,
+//   });
+// }
+
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   List<Destinasi> _recommendedPlaces = [];
+  List<PaketWisata> _paketWisataList = [];
   List<String> _carouselImages = [];
 
   Map<int, String> kategoriMap = {
@@ -73,11 +88,38 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
+  List<PaketWisata> dummyPaketWisataList = [
+    PaketWisata(
+      nama: 'Paket Premium',
+      harga: 100000,
+      deskripsi:
+          'Paket yang cocok untuk pengalaman wisata yang berkualitas dengan pelayanan terbaik.',
+      id_desawisata: '1',
+      gambar: 'assets/images/produk.png',
+    ),
+    PaketWisata(
+      nama: 'Paket Keluarga',
+      harga: 50000,
+      deskripsi:
+          'Paket yang cocok untuk pengalaman wisata yang bersama keluarga dengan harga spesial.',
+      id_desawisata: '2',
+      gambar: 'assets/images/produk.png',
+    ),
+    PaketWisata(
+      nama: 'Paket Hari Raya',
+      harga: 20000,
+      deskripsi: 'Paket yang cocok untuk pengalaman wisata saat hari raya.',
+      id_desawisata: '3',
+      gambar: 'assets/images/produk.png',
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
     _carouselImages = dummyCarouselImages;
     _recommendedPlaces = dummyRecommendedPlaces;
+    _paketWisataList = dummyPaketWisataList;
   }
 
   static List<Widget> _widgetOptions = <Widget>[
@@ -219,9 +261,9 @@ class MainPage extends StatelessWidget {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              screenSize.width * 0.07,
+              screenSize.width * 0.05,
               screenSize.height * 0.01,
-              screenSize.width * 0.07,
+              screenSize.width * 0.05,
               screenSize.height * 0.01,
             ),
             child: Column(
@@ -258,10 +300,100 @@ class MainPage extends StatelessWidget {
                     );
                   }).toList(),
                 ),
+                const Text(
+                  'Paket Wisata',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: screenSize.height * 0.01),
+                Column(
+                  children: _homePageState._paketWisataList.map((paket) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailPaketwisata(
+                              paketWisata: paket,
+                            ),
+                          ),
+                        );
+                      },
+                      child: PaketWisataCard(
+                        gambar: paket.gambar,
+                        nama: paket.nama,
+                        harga: paket.harga,
+                      ),
+                    );
+                  }).toList(),
+                ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PaketWisataCard extends StatelessWidget {
+  final String gambar;
+  final String nama;
+  final int harga;
+
+  const PaketWisataCard({
+    required this.gambar,
+    required this.nama,
+    required this.harga,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.01),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Image.asset(
+                gambar,
+                width: screenSize.width * 0.3,
+                height: screenSize.height * 0.15,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(width: screenSize.width * 0.05),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nama,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: screenSize.height * 0.01),
+                Text(
+                  'Rp ${harga.toString()}',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
