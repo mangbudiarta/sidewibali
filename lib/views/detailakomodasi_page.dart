@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sidewibali/models/akomodasi_model.dart';
-import 'package:sidewibali/models/desawisata_model.dart';
-import 'package:sidewibali/models/informasi_model.dart'; // Import model InformasiKontak
+import 'package:sidewibali/models/informasi_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/widgets/informasi_kontak.dart';
 
@@ -23,8 +22,8 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
   void initState() {
     super.initState();
     _informasiKontak =
-        ApiService().fetchInformasiKontak(widget.akomodasi.id_desawisata);
-    _namaDesa = ApiService().fetchNamaDesa(widget.akomodasi.id_desawisata);
+        ApiService().fetchInformasiKontak(widget.akomodasi.idDesawisata);
+    _namaDesa = ApiService().fetchNamaDesa(widget.akomodasi.idDesawisata);
   }
 
   @override

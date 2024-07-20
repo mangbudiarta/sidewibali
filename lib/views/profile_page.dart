@@ -6,9 +6,7 @@ import 'package:sidewibali/services/api_service.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfilPage extends StatefulWidget {
-  final Map<String, dynamic> userDetails;
-
-  const ProfilPage({super.key, required this.userDetails});
+  const ProfilPage({super.key});
 
   @override
   State<ProfilPage> createState() => _ProfilPageState();
@@ -17,24 +15,54 @@ class ProfilPage extends StatefulWidget {
 class _ProfilPageState extends State<ProfilPage> {
   bool isObscurePassword = true;
   final _formKey = GlobalKey<FormState>();
-  late String namaLengkap;
-  late String email;
-  late String password;
-  late String noTelp;
+  late TextEditingController _namaLengkapController;
+  late TextEditingController _emailController;
+  late TextEditingController _noTelpController;
+  late TextEditingController _passwordController;
   String? foto;
   File? _imageFile;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserDetails();
-    namaLengkap = widget.userDetails['nama'];
-    email = widget.userDetails['email'];
-    password = ''; // Buat field password kosong
-    noTelp = widget.userDetails['no_telp'];
-    foto = widget.userDetails['foto'] != null
-        ? 'http://192.168.43.155:3000/resource/akun/${widget.userDetails['foto']}'
-        : null;
+    _namaLengkapController = TextEditingController();
+    _emailController = TextEditingController();
+    _noTelpController = TextEditingController();
+    _passwordController = TextEditingController();
+    _fetchAkunDetails();
+  }
+
+  @override
+  void dispose() {
+    _namaLengkapController.dispose();
+    _emailController.dispose();
+    _noTelpController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchAkunDetails() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      if (userId != null) {
+        final userDetails = await ApiService.fetchAkunDetail(userId);
+
+        setState(() {
+          _namaLengkapController.text = userDetails['nama'] ?? '';
+          _emailController.text = userDetails['email'] ?? '';
+          _noTelpController.text = userDetails['no_telp'] ?? '';
+          _passwordController.text = ''; // Atur password jika diperlukan
+          foto = userDetails['foto'] != null
+              ? 'http://192.168.43.155:3000/resource/akun/${userDetails['foto']}'
+              : null;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $e')),
+      );
+    }
   }
 
   Future<void> _pickImage() async {
@@ -131,7 +159,7 @@ class _ProfilPageState extends State<ProfilPage> {
                     children: [
                       const SizedBox(height: 0),
                       Text(
-                        namaLengkap,
+                        _namaLengkapController.text,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -145,16 +173,13 @@ class _ProfilPageState extends State<ProfilPage> {
                   labelText: "Nama Lengkap",
                   placeholder: "Masukkan nama lengkap",
                   isPasswordTextField: false,
-                  hasIcon: true,
-                  initialValue: namaLengkap,
+                  hasIcon: false,
+                  controller: _namaLengkapController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Nama lengkap tidak boleh kosong';
                     }
                     return null;
-                  },
-                  onSaved: (value) {
-                    namaLengkap = value!;
                   },
                 ),
                 buildTextField(
@@ -162,7 +187,7 @@ class _ProfilPageState extends State<ProfilPage> {
                   placeholder: "Masukkan alamat email",
                   isPasswordTextField: false,
                   hasIcon: false,
-                  initialValue: email,
+                  controller: _emailController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Email tidak boleh kosong';
@@ -172,16 +197,13 @@ class _ProfilPageState extends State<ProfilPage> {
                     }
                     return null;
                   },
-                  onSaved: (value) {
-                    email = value!;
-                  },
                 ),
                 buildTextField(
                   labelText: "Nomor Telepon",
                   placeholder: "Masukkan nomor telepon",
                   isPasswordTextField: false,
                   hasIcon: false,
-                  initialValue: noTelp,
+                  controller: _noTelpController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Nomor telepon tidak boleh kosong';
@@ -191,24 +213,18 @@ class _ProfilPageState extends State<ProfilPage> {
                     }
                     return null;
                   },
-                  onSaved: (value) {
-                    noTelp = value!;
-                  },
                 ),
                 buildTextField(
                   labelText: "Ganti Password",
                   placeholder: "Masukkan password baru",
                   isPasswordTextField: true,
                   hasIcon: true,
-                  initialValue: password,
+                  controller: _passwordController,
                   validator: (value) {
                     if (value != null && value.isNotEmpty && value.length < 6) {
                       return 'Password harus terdiri dari minimal 6 karakter';
                     }
                     return null;
-                  },
-                  onSaved: (value) {
-                    password = value!;
                   },
                 ),
                 const SizedBox(height: 30),
@@ -223,8 +239,8 @@ class _ProfilPageState extends State<ProfilPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
                       foregroundColor: white,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -258,96 +274,77 @@ class _ProfilPageState extends State<ProfilPage> {
     required String placeholder,
     required bool isPasswordTextField,
     required bool hasIcon,
-    String? initialValue,
+    required TextEditingController controller,
     FormFieldValidator<String>? validator,
-    FormFieldSetter<String>? onSaved,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 30),
       child: TextFormField(
         obscureText: isPasswordTextField ? isObscurePassword : false,
-        initialValue: initialValue,
+        controller: controller,
+        validator: validator,
         decoration: InputDecoration(
           suffixIcon: hasIcon
               ? IconButton(
-                  icon: Icon(
-                    isPasswordTextField
-                        ? isObscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility
-                        : null,
-                    color: Colors.grey,
-                  ),
                   onPressed: () {
-                    if (isPasswordTextField) {
-                      setState(() {
-                        isObscurePassword = !isObscurePassword;
-                      });
-                    }
+                    setState(() {
+                      isObscurePassword = !isObscurePassword;
+                    });
                   },
+                  icon: Icon(
+                    isObscurePassword ? Icons.visibility_off : Icons.visibility,
+                  ),
                 )
               : null,
           contentPadding: const EdgeInsets.only(bottom: 5),
           labelText: labelText,
-          labelStyle: const TextStyle(fontSize: 15),
           floatingLabelBehavior: FloatingLabelBehavior.always,
           hintText: placeholder,
           hintStyle: const TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Colors.grey,
           ),
         ),
-        validator: validator,
-        onSaved: onSaved,
       ),
     );
   }
 
-  Future<void> _fetchUserDetails() async {
-    final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('token');
-    final userId = widget.userDetails['id'];
-
-    if (accessToken != null) {
-      final updatedUserDetails =
-          await ApiService.getAccountDetails(userId, accessToken);
-      if (updatedUserDetails != null) {
-        setState(() {
-          widget.userDetails['nama'] = updatedUserDetails['nama'];
-          widget.userDetails['email'] = updatedUserDetails['email'];
-          widget.userDetails['no_telp'] = updatedUserDetails['no_telp'];
-          // Update foto jika diperlukan
-          if (updatedUserDetails['foto'] != null) {
-            widget.userDetails['foto'] =
-                'http://192.168.43.155:3000/resource/akun/${updatedUserDetails['foto']}';
-          }
-        });
-      }
-    }
-  }
-
   Future<void> _updateProfile() async {
     try {
-      final userId = widget.userDetails['id'];
-      final response = await ApiService.updateProfile(
-        userId: userId,
-        namaLengkap: namaLengkap,
-        email: email,
-        noTelp: noTelp,
-        password: password.isNotEmpty ? password : null,
-        foto: foto,
-      );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      if (userId != null) {
+        // Buat map untuk data yang akan dikirim
+        Map<String, dynamic> data = {
+          'id': userId,
+          'nama': _namaLengkapController.text,
+          'email': _emailController.text,
+          'no_telp': _noTelpController.text,
+        };
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profil berhasil diperbarui')),
-        );
-        await _fetchUserDetails();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal memperbarui profil')),
-        );
+        // Tambahkan password jika diisi
+        if (_passwordController.text.isNotEmpty) {
+          data['password'] = _passwordController.text;
+        }
+
+        // Tambahkan foto jika dipilih
+        if (_imageFile != null) {
+          data['foto'] = _imageFile!.path;
+        }
+
+        // Panggil API update
+        final response = await ApiService.updateAkun(data);
+
+        if (response['success']) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Profil berhasil diperbarui')),
+          );
+          // Muat ulang data profil
+          _fetchAkunDetails();
+        } else {
+          throw Exception(response['message'] ?? 'Gagal memperbarui profil');
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -356,26 +353,25 @@ class _ProfilPageState extends State<ProfilPage> {
     }
   }
 
-  Future<void> _showLogoutConfirmationDialog() async {
+  void _showLogoutConfirmationDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Konfirmasi Logout"),
-          content: const Text("Apakah Anda yakin ingin logout?"),
+          title: const Text('Logout'),
+          content: const Text('Apakah Anda yakin ingin logout?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("Batal"),
+              child: const Text('Batal'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
                 _logout();
               },
-              child: const Text("Logout"),
+              child: const Text('Logout'),
             ),
           ],
         );
@@ -384,48 +380,8 @@ class _ProfilPageState extends State<ProfilPage> {
   }
 
   Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('token');
-
-    if (accessToken != null) {
-      try {
-        final response = await ApiService.logout(accessToken);
-
-        if (response.statusCode == 200) {
-          // Hapus token dari SharedPreferences setelah logout berhasil
-          prefs.remove('token');
-
-          // Tampilkan snackbar untuk pesan berhasil logout
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Logout berhasil')),
-          );
-
-          // Navigasi ke halaman login dan hapus semua rute lain di dalam stack
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/login',
-            (route) => false,
-          );
-        } else {
-          // Tampilkan snackbar untuk pesan gagal logout jika status code bukan 200
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gagal logout')),
-          );
-        }
-      } catch (e) {
-        print('Error: $e');
-        // Tampilkan snackbar untuk pesan terjadi kesalahan jika terjadi exception
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Terjadi kesalahan')),
-        );
-      }
-    } else {
-      // Jika token tidak ada, langsung navigasi ke halaman login
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/login',
-        (route) => false,
-      );
-    }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 }

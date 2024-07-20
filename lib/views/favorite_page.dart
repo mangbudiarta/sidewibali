@@ -38,7 +38,7 @@ class _FavoritePageState extends State<FavoritePage> {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              // Implement onTap action if needed
+              // Aksi jika ditekan
             },
             child: Card(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -57,7 +57,7 @@ class _FavoritePageState extends State<FavoritePage> {
                         Image.asset(
                           favoriteDestinations[index].image,
                           width: double.infinity,
-                          height: 160, // Adjusted height
+                          height: 160,
                           fit: BoxFit.cover,
                         ),
                         Positioned(

@@ -31,39 +31,29 @@ class _LoginViewState extends State<LoginView> {
         if (result['success']) {
           String token = result['data'];
 
-          // Simpan token menggunakan shared_preferences
           SharedPreferences preferences = await SharedPreferences.getInstance();
           await preferences.setString('token', token);
 
           Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
           int userId = decodedToken['id'];
+          await preferences.setInt('userId', userId);
 
-          // Panggil API untuk mendapatkan detail user
-          var userDetails = await ApiService.getAccountDetails(userId, token);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login successful!')),
+          );
 
-          if (userDetails != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Login successful!')),
-            );
-
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomePage(userDetails: userDetails),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('User details are null')),
-            );
-          }
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(),
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed: ${result['message']}')),
           );
         }
       } catch (e) {
-        print('Error during login: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('An error occurred: $e')),
         );
@@ -108,8 +98,8 @@ class _LoginViewState extends State<LoginView> {
                   decoration: InputDecoration(
                     labelText: "Email",
                     hintText: "Enter your email",
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -131,8 +121,8 @@ class _LoginViewState extends State<LoginView> {
                   decoration: InputDecoration(
                     labelText: "Password",
                     hintText: "Enter your password",
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),

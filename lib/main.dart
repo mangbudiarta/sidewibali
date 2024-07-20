@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/homepage': (context) => const HomePage(userDetails: {}),
+        '/homepage': (context) => const HomePage(),
         '/registration': (context) => const RegisterView(),
         '/onboarding': (context) => const OnboardingView(),
         '/login': (context) => const LoginView(),
@@ -63,12 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 2));
 
     if (onboardingShown) {
-      if (token != null) {
-        // Redirect to homepage if token exists
-        Navigator.of(context).pushReplacementNamed('/homepage');
-      } else {
-        Navigator.of(context).pushReplacementNamed('/login');
-      }
+      Navigator.of(context).pushReplacementNamed('/homepage');
     } else {
       _controller.addStatusListener((status) {
         if (status == AnimationStatus.completed) {

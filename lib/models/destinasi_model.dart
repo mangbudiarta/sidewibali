@@ -3,16 +3,16 @@ class Destinasi {
   final String gambar;
   final String nama;
   final String deskripsi;
-  final int id_kategoridestinasi;
-  final int id_desawisata;
+  final int idKategoridestinasi;
+  final int idDesawisata;
 
   Destinasi({
     required this.id,
     required this.gambar,
     required this.nama,
     required this.deskripsi,
-    required this.id_kategoridestinasi,
-    required this.id_desawisata,
+    required this.idKategoridestinasi,
+    required this.idDesawisata,
   });
   factory Destinasi.fromJson(Map<String, dynamic> json) {
     return Destinasi(
@@ -20,7 +20,7 @@ class Destinasi {
         gambar: json['gambar'],
         nama: json['nama'],
         deskripsi: json['deskripsi'],
-        id_kategoridestinasi: json['id_kategoridestinasi'],
-        id_desawisata: json['id_desawisata']);
+        idKategoridestinasi: json['id_kategoridestinasi'],
+        idDesawisata: json['id_desawisata']);
   }
 }
