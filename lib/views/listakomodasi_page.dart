@@ -28,7 +28,6 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
       final apiService = ApiService();
       final fetchedAccommodations = await apiService.fetchAkomodasiList();
 
-      // Extract unique categories
       final uniqueCategories = <String>{};
       for (var accommodation in fetchedAccommodations) {
         uniqueCategories.add(accommodation.kategori);
@@ -39,8 +38,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
         categories = ['Semua', ...uniqueCategories.toList()];
       });
     } catch (e) {
-      // Handle error (e.g., show an alert)
-      print('Error loading data: $e');
+      print(e);
     }
   }
 

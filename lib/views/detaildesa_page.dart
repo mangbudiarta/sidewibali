@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:sidewibali/models/akomodasi_model.dart';
 import 'package:sidewibali/models/desawisata_model.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
-import 'package:sidewibali/models/informasi_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/views/detailakomodasi_page.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
@@ -81,31 +80,28 @@ class _DetailDesaState extends State<DetailDesa> {
       });
     } catch (e) {
       print(e);
-      // Handle error here
     }
   }
 
   Future<void> _fetchDestinasiWisata(int idDesaWisata) async {
     try {
       final data = await apiService.fetchDestinasiWisata(idDesaWisata);
-      print("Destinasi Wisata Data: $data"); // Cetak data
       setState(() {
         destinasiWisata = data;
       });
     } catch (e) {
-      print("Error fetching Destinasi Wisata: $e");
+      print(e);
     }
   }
 
   Future<void> _fetchAkomodasi(int idDesaWisata) async {
     try {
       final data = await apiService.fetchAkomodasi(idDesaWisata);
-      print("Akomodasi Data: $data"); // Cetak data
       setState(() {
         akomodasi = data;
       });
     } catch (e) {
-      print("Error fetching Akomodasi: $e");
+      print(e);
     }
   }
 
@@ -117,7 +113,6 @@ class _DetailDesaState extends State<DetailDesa> {
       });
     } catch (e) {
       print(e);
-      // Handle error here
     }
   }
 
@@ -472,7 +467,7 @@ class WisataCard extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => DetailDestinasi(
               destinasi: destinasi,
-            ), // Navigasi ke DetailAkomodasi
+            ),
           ),
         );
       },
@@ -514,13 +509,13 @@ class WisataCard extends StatelessWidget {
 class AkomodasiCard extends StatelessWidget {
   final String imageUrl;
   final String title;
-  final Akomodasi akomodasi; // Tambahkan parameter ini
+  final Akomodasi akomodasi;
 
   const AkomodasiCard({
     super.key,
     required this.imageUrl,
     required this.title,
-    required this.akomodasi, // Tambahkan parameter ini
+    required this.akomodasi,
   });
 
   @override
@@ -530,8 +525,7 @@ class AkomodasiCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailAkomodasi(
-                akomodasi: akomodasi), // Navigasi ke DetailAkomodasi
+            builder: (context) => DetailAkomodasi(akomodasi: akomodasi),
           ),
         );
       },

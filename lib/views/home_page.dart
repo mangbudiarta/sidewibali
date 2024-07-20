@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
@@ -19,14 +20,14 @@ import 'package:sidewibali/views/website_page.dart';
 import 'package:sidewibali/widgets/menu_item.dart';
 
 class HomePage extends StatefulWidget {
-  final Map<String, dynamic> userDetails;
-  const HomePage({super.key, required this.userDetails});
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isLoggedIn = false;
   int _selectedIndex = 0;
   List<Destinasi> _recommendedPlaces = [];
   List<String> _carouselImages = [];
@@ -47,6 +48,7 @@ class _HomePageState extends State<HomePage> {
     'assets/images/beratan.png',
     'assets/images/kuta.png',
     'assets/images/ubud.png',
+    'assets/images/kuta.png',
   ];
 
   List<Destinasi> dummyRecommendedPlaces = [
@@ -56,8 +58,8 @@ class _HomePageState extends State<HomePage> {
       nama: 'Danau Beratan',
       deskripsi:
           'Danau beratan merupakan sebuah destinasi yang ada di desa candikuning. Destinasi ini sering dikunjungi wisatawan',
-      id_kategoridestinasi: 3,
-      id_desawisata: 1,
+      idKategoridestinasi: 3,
+      idDesawisata: 1,
     ),
     Destinasi(
       id: 2,
@@ -65,16 +67,16 @@ class _HomePageState extends State<HomePage> {
       nama: 'Puri Ubud',
       deskripsi:
           'Puri Ubud merupakan sebuah tempat yang terkenal di Ubud hingga dunia. Puri Ubud merupakan tempat tinggal dari Raja Ubud',
-      id_kategoridestinasi: 1,
-      id_desawisata: 2,
+      idKategoridestinasi: 1,
+      idDesawisata: 2,
     ),
     Destinasi(
       id: 3,
       gambar: 'assets/images/kuta.png',
       nama: 'Kuta',
       deskripsi: 'Pantai terkenal dengan ombak dan kehidupan malamnya.',
-      id_kategoridestinasi: 2,
-      id_desawisata: 3,
+      idKategoridestinasi: 2,
+      idDesawisata: 3,
     ),
   ];
 
@@ -83,20 +85,30 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _carouselImages = dummyCarouselImages;
     _recommendedPlaces = dummyRecommendedPlaces;
+    _checkLoginStatus();
   }
 
-  List<Widget> _widgetOptions(Map<String, dynamic> userDetails) {
-    bool isLoggedIn = userDetails.containsKey('id') &&
-        userDetails['id'] != null &&
-        userDetails.containsKey('token') &&
-        userDetails['token'] != null;
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? token = preferences.getString('token');
+    int? userId = preferences.getInt('userId');
 
+    setState(() {
+      if (token != null && userId != null) {
+        isLoggedIn = true;
+      } else {
+        isLoggedIn = false;
+      }
+    });
+  }
+
+  List<Widget> _widgetOptions() {
     if (isLoggedIn) {
       return <Widget>[
         const MainPage(),
         const FavoritePage(),
         const NotificationPage(),
-        ProfilPage(userDetails: userDetails),
+        ProfilPage(),
       ];
     } else {
       return <Widget>[
@@ -141,7 +153,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: _widgetOptions(widget.userDetails).elementAt(_selectedIndex),
+      body: _widgetOptions().elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: primary,
@@ -275,7 +287,7 @@ class MainPage extends StatelessWidget {
                         gambar: place.gambar,
                         nama: place.nama,
                         id_desawisata:
-                            homePageState.desaMap[place.id_desawisata] ??
+                            homePageState.desaMap[place.idDesawisata] ??
                                 'Unknown',
                       ),
                     );

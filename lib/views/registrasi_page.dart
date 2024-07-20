@@ -17,7 +17,8 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -32,7 +33,7 @@ class _RegisterViewState extends State<RegisterView> {
         nama: name,
         email: email,
         password: password,
-        no_telp: phone,
+        noTelp: phone,
       );
       bool success = await ApiService.registerUser(newUser);
 
@@ -90,8 +91,8 @@ class _RegisterViewState extends State<RegisterView> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -109,8 +110,8 @@ class _RegisterViewState extends State<RegisterView> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -147,8 +148,8 @@ class _RegisterViewState extends State<RegisterView> {
                         },
                       ),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -185,8 +186,8 @@ class _RegisterViewState extends State<RegisterView> {
                         },
                       ),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -206,8 +207,8 @@ class _RegisterViewState extends State<RegisterView> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {

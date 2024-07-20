@@ -77,7 +77,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Box
+            // Pencarian
             Container(
               height: 50,
               decoration: BoxDecoration(
@@ -100,7 +100,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
               ),
             ),
             const SizedBox(height: 16.0),
-            // Filter by Category
+            // Kategori
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -130,7 +130,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                 }).toList(),
               ),
             ),
-            // Dropdown for Kabupaten selection
+            // Dropdown Kabupaten
             if (selectedCategory == 'Kabupaten')
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),

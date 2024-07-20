@@ -1,6 +1,4 @@
-// lib/widget/baris_info_kontak.dart
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BarisInfoKontak extends StatelessWidget {
   final IconData icon;
