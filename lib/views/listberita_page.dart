@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sidewibali/models/berita_model.dart'; // Import model Berita
-import 'package:sidewibali/services/api_service.dart'; // Import api_service
+import 'package:sidewibali/models/berita_model.dart'; 
+import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detailberita_page.dart';
 

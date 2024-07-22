@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class Berita {
   final int id;
   final String judul;
@@ -14,6 +16,7 @@ class Berita {
     required this.idDesawisata,
     required this.createdAt,
   });
+  
   factory Berita.fromJson(Map<String, dynamic> json) {
     return Berita(
       id: json['id'],
