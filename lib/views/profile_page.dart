@@ -1,7 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/utils/colors.dart';
+import 'package:sidewibali/services/api_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfilPage extends StatefulWidget {
+  const ProfilPage({super.key});
+
   @override
   State<ProfilPage> createState() => _ProfilPageState();
 }
@@ -9,17 +15,75 @@ class ProfilPage extends StatefulWidget {
 class _ProfilPageState extends State<ProfilPage> {
   bool isObscurePassword = true;
   final _formKey = GlobalKey<FormState>();
-  String namaLengkap = "Dodek Alit";
-  String email = "dodekalit@gmail.com";
-  String password = "";
+  late TextEditingController _namaLengkapController;
+  late TextEditingController _emailController;
+  late TextEditingController _noTelpController;
+  late TextEditingController _passwordController;
+  String? foto;
+  File? _imageFile;
+
+  @override
+  void initState() {
+    super.initState();
+    _namaLengkapController = TextEditingController();
+    _emailController = TextEditingController();
+    _noTelpController = TextEditingController();
+    _passwordController = TextEditingController();
+    _fetchAkunDetails();
+  }
+
+  @override
+  void dispose() {
+    _namaLengkapController.dispose();
+    _emailController.dispose();
+    _noTelpController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchAkunDetails() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      if (userId != null) {
+        final userDetails = await ApiService.fetchAkunDetail(userId);
+
+        setState(() {
+          _namaLengkapController.text = userDetails['nama'] ?? '';
+          _emailController.text = userDetails['email'] ?? '';
+          _noTelpController.text = userDetails['no_telp'] ?? '';
+          _passwordController.text = ''; // Atur password jika diperlukan
+          foto = userDetails['foto'] != null
+              ? 'http://192.168.43.155:3000/resource/akun/${userDetails['foto']}'
+              : null;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $e')),
+      );
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+        foto = null;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(60),
         child: AppBar(
-          title: Text('Profile'),
+          title: const Text('Profile'),
           centerTitle: true,
           backgroundColor: Colors.white,
           elevation: 0,
@@ -27,7 +91,7 @@ class _ProfilPageState extends State<ProfilPage> {
         ),
       ),
       body: Container(
-        padding: EdgeInsets.only(left: 15, top: 20, right: 15),
+        padding: const EdgeInsets.only(left: 15, top: 20, right: 15),
         child: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
@@ -36,7 +100,7 @@ class _ProfilPageState extends State<ProfilPage> {
             key: _formKey,
             child: ListView(
               children: [
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: Stack(
                     children: [
@@ -53,12 +117,17 @@ class _ProfilPageState extends State<ProfilPage> {
                             )
                           ],
                           shape: BoxShape.circle,
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(
-                              'https://cdn.pixabay.com/photo/2017/05/31/04/59/beautiful-2359121_1280.jpg',
-                            ),
-                          ),
+                          image: _imageFile != null
+                              ? DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: FileImage(_imageFile!),
+                                )
+                              : (foto != null
+                                  ? DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(foto!),
+                                    )
+                                  : null),
                         ),
                       ),
                       Positioned(
@@ -73,25 +142,25 @@ class _ProfilPageState extends State<ProfilPage> {
                             color: Colors.white,
                           ),
                           child: IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.camera_alt,
                               color: Colors.black,
                             ),
-                            onPressed: () {},
+                            onPressed: _pickImage,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 0),
+                const SizedBox(height: 0),
                 Center(
                   child: Column(
                     children: [
-                      SizedBox(height: 0),
+                      const SizedBox(height: 0),
                       Text(
-                        'Dodek Alit',
-                        style: TextStyle(
+                        _namaLengkapController.text,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -99,21 +168,18 @@ class _ProfilPageState extends State<ProfilPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 buildTextField(
                   labelText: "Nama Lengkap",
                   placeholder: "Masukkan nama lengkap",
                   isPasswordTextField: false,
-                  hasIcon: true,
-                  initialValue: namaLengkap,
+                  hasIcon: false,
+                  controller: _namaLengkapController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Nama lengkap tidak boleh kosong';
                     }
                     return null;
-                  },
-                  onSaved: (value) {
-                    namaLengkap = value!;
                   },
                 ),
                 buildTextField(
@@ -121,7 +187,7 @@ class _ProfilPageState extends State<ProfilPage> {
                   placeholder: "Masukkan alamat email",
                   isPasswordTextField: false,
                   hasIcon: false,
-                  initialValue: email,
+                  controller: _emailController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Email tidak boleh kosong';
@@ -131,8 +197,21 @@ class _ProfilPageState extends State<ProfilPage> {
                     }
                     return null;
                   },
-                  onSaved: (value) {
-                    email = value!;
+                ),
+                buildTextField(
+                  labelText: "Nomor Telepon",
+                  placeholder: "Masukkan nomor telepon",
+                  isPasswordTextField: false,
+                  hasIcon: false,
+                  controller: _noTelpController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nomor telepon tidak boleh kosong';
+                    }
+                    if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                      return 'Masukkan nomor telepon yang valid';
+                    }
+                    return null;
                   },
                 ),
                 buildTextField(
@@ -140,61 +219,45 @@ class _ProfilPageState extends State<ProfilPage> {
                   placeholder: "Masukkan password baru",
                   isPasswordTextField: true,
                   hasIcon: true,
-                  initialValue: password,
+                  controller: _passwordController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Password tidak boleh kosong';
-                    }
-                    if (value.length < 6) {
+                    if (value != null && value.isNotEmpty && value.length < 6) {
                       return 'Password harus terdiri dari minimal 6 karakter';
                     }
                     return null;
                   },
-                  onSaved: (value) {
-                    password = value!;
-                  },
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Profil berhasil disimpan')),
-                        );
+                        _updateProfile(); // Panggil fungsi update profile
                       }
                     },
-                    child: Text("Simpan"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
                       foregroundColor: white,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
+                    child: const Text("Simpan"),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
-                  child: TextButton(
+                  child: TextButton.icon(
                     onPressed: () {
                       _showLogoutConfirmationDialog();
                     },
-                    child: Text(
+                    icon: const Icon(Icons.logout, color: Colors.red),
+                    label: const Text(
                       "Logout",
                       style: TextStyle(fontSize: 15, color: Colors.red),
-                    ),
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
                     ),
                   ),
                 ),
@@ -211,72 +274,114 @@ class _ProfilPageState extends State<ProfilPage> {
     required String placeholder,
     required bool isPasswordTextField,
     required bool hasIcon,
-    required String initialValue,
-    required String? Function(String?) validator,
-    required void Function(String?) onSaved,
+    required TextEditingController controller,
+    FormFieldValidator<String>? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 30),
       child: TextFormField(
         obscureText: isPasswordTextField ? isObscurePassword : false,
-        initialValue: initialValue,
+        controller: controller,
+        validator: validator,
         decoration: InputDecoration(
           suffixIcon: hasIcon
               ? IconButton(
-                  icon: Icon(
-                    isPasswordTextField ? Icons.visibility : Icons.create,
-                    color: Colors.grey,
-                  ),
                   onPressed: () {
-                    if (isPasswordTextField) {
-                      setState(() {
-                        isObscurePassword = !isObscurePassword;
-                      });
-                    } else {
-                      Navigator.pushNamed(context, '/edit_password');
-                    }
+                    setState(() {
+                      isObscurePassword = !isObscurePassword;
+                    });
                   },
+                  icon: Icon(
+                    isObscurePassword ? Icons.visibility_off : Icons.visibility,
+                  ),
                 )
               : null,
-          contentPadding: EdgeInsets.only(bottom: 5),
+          contentPadding: const EdgeInsets.only(bottom: 5),
           labelText: labelText,
           floatingLabelBehavior: FloatingLabelBehavior.always,
           hintText: placeholder,
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.grey,
           ),
         ),
-        validator: validator,
-        onSaved: onSaved,
       ),
     );
+  }
+
+  Future<void> _updateProfile() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      if (userId != null) {
+        // Buat map untuk data yang akan dikirim
+        Map<String, dynamic> data = {
+          'id': userId,
+          'nama': _namaLengkapController.text,
+          'email': _emailController.text,
+          'no_telp': _noTelpController.text,
+        };
+
+        // Tambahkan password jika diisi
+        if (_passwordController.text.isNotEmpty) {
+          data['password'] = _passwordController.text;
+        }
+
+        // Tambahkan foto jika dipilih
+        if (_imageFile != null) {
+          data['foto'] = _imageFile!.path;
+        }
+
+        // Panggil API update
+        final response = await ApiService.updateAkun(data);
+
+        if (response['success']) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Profil berhasil diperbarui')),
+          );
+          // Muat ulang data profil
+          _fetchAkunDetails();
+        } else {
+          throw Exception(response['message'] ?? 'Gagal memperbarui profil');
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $e')),
+      );
+    }
   }
 
   void _showLogoutConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Konfirmasi Logout'),
-          content: Text('Apakah Anda yakin ingin logout?'),
+          title: const Text('Logout'),
+          content: const Text('Apakah Anda yakin ingin logout?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Batal'),
+              child: const Text('Batal'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                _logout();
               },
-              child: Text('Logout', style: TextStyle(color: Colors.red)),
+              child: const Text('Logout'),
             ),
           ],
         );
       },
     );
+  }
+
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 }

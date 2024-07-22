@@ -2,7 +2,7 @@ class User {
   final String nama;
   final String email;
   final String password;
-  final String no_telp;
+  final String noTelp;
   final String? foto;
   final String role;
 
@@ -10,7 +10,7 @@ class User {
     required this.nama,
     required this.email,
     required this.password,
-    required this.no_telp,
+    required this.noTelp,
     this.foto,
     this.role = 'USER',
   });
@@ -20,7 +20,7 @@ class User {
       'nama': nama,
       'email': email,
       'password': password,
-      'no_telp': no_telp,
+      'no_telp': noTelp,
       'foto': foto,
       'role': role,
     };

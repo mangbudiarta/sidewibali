@@ -1,34 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:sidewibali/models/akomodasi_model.dart';
 import 'package:sidewibali/models/informasi_model.dart';
+import 'package:sidewibali/models/paketwisata_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/widgets/informasi_kontak.dart';
 
-class DetailAkomodasi extends StatefulWidget {
-  final Akomodasi akomodasi;
+class DetailPaketwisata extends StatefulWidget {
+  final PaketWisata paketWisata;
+  final String? namadesa;
 
-  const DetailAkomodasi({super.key, required this.akomodasi});
+  DetailPaketwisata({
+    super.key,
+    required this.paketWisata,
+    required this.namadesa,
+  });
 
   @override
-  _DetailAkomodasiState createState() => _DetailAkomodasiState();
+  _DetailPaketwisataState createState() => _DetailPaketwisataState();
 }
 
-class _DetailAkomodasiState extends State<DetailAkomodasi> {
+class _DetailPaketwisataState extends State<DetailPaketwisata> {
   late Future<InformasiKontak> _informasiKontak;
-  late Future<String> _namaDesa;
 
   @override
   void initState() {
     super.initState();
     _informasiKontak =
-        ApiService().fetchInformasiKontak(widget.akomodasi.idDesawisata);
-    _namaDesa = ApiService().fetchNamaDesa(widget.akomodasi.idDesawisata);
+        ApiService().fetchInformasiKontak(widget.paketWisata.idDesawisata);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,9 +40,10 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
             Stack(
               children: [
                 Image.network(
-                  "http://192.168.43.155:3000/resource/akomodasi/${widget.akomodasi.gambar}",
-                  height: 400,
+                  "http://192.168.43.155:3000/resource/desawisata/${widget.paketWisata.gambar}",
                   fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 400,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
                       'assets/images/default_image.png',
@@ -65,7 +70,7 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.pop(context);
                       },
                     ),
                   ),
@@ -78,55 +83,42 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          widget.akomodasi.kategori,
-                          style: const TextStyle(fontSize: 16),
+                      Text(
+                        widget.paketWisata.nama,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Spacer(),
+                      Text(
+                        'Rp. ${widget.paketWisata.harga}',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.akomodasi.nama,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.namadesa ?? 'Desa Tidak Diketahui',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  FutureBuilder<String>(
-                    future: _namaDesa,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (snapshot.hasData) {
-                        return Row(
-                          children: [
-                            const Icon(Icons.location_on, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Text(
-                              snapshot.data!,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return const Text('Desa Tidak Diketahui');
-                      }
-                    },
+                  const SizedBox(height: 16),
+                  Text(
+                    widget.paketWisata.deskripsi,
+                    style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 8),
                   FutureBuilder<InformasiKontak>(
@@ -143,7 +135,7 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
                           children: [
                             const SizedBox(height: 16),
                             const Text(
-                              'Informasi AKomodasi',
+                              'Informasi Paket Wisata',
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold),
                             ),

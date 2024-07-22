@@ -22,7 +22,7 @@ List onboardingData = [
 ];
 
 class OnboardingView extends StatefulWidget {
-  const OnboardingView({Key? key}) : super(key: key);
+  const OnboardingView({super.key});
 
   @override
   State<OnboardingView> createState() => _OnboardingViewState();
@@ -72,7 +72,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                                     Text(
                                       onboardingData[i]['title'],
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontFamily: "nunitoBold",
                                           fontSize: 24,
                                           color: Colors.black),
@@ -83,7 +83,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                                       child: Text(
                                         onboardingData[i]['desc'],
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontFamily: "nunitoRegular",
                                             fontSize: 14,
                                             color: Colors.grey),
@@ -144,7 +144,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                           ? "Start Now"
                           : "Next",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontFamily: "nunitoSemiBold",
                           fontSize: 14,
                           color: Colors.white),

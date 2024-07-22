@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class NotificationPage extends StatefulWidget {
+  const NotificationPage({super.key});
+
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
@@ -16,7 +18,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifikasi'),
+        title: const Text('Notifikasi'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -33,7 +35,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     color: Colors.grey[300]), // Garis pembatas tipis
               ListTile(
                 contentPadding:
-                    EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 title: Text(
                   notifikasiList[index]["deskripsi"],
                   style: TextStyle(
@@ -63,7 +65,7 @@ class _NotificationPageState extends State<NotificationPage> {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: NotificationPage(),
   ));
 }

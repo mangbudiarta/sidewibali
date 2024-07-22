@@ -1,88 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:sidewibali/models/produk_model.dart';
-import 'package:sidewibali/models/desa_model.dart';
+import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/views/detailproduk_page.dart';
 
 class ProdukPage extends StatefulWidget {
+  const ProdukPage({super.key});
+
   @override
   _ProdukPageState createState() => _ProdukPageState();
 }
 
-List<Produk> dummyProduk = [
-  Produk(
-    nama: 'Patung Petani',
-    harga: 10000,
-    deskripsi:
-        'Sebuah oleh-oleh khas yang menceritakan kehidupan masyarakat saat bertani',
-    id_desawisata: '1',
-    gambar: 'assets/images/produk.png',
-  ),
-  Produk(
-    nama: 'Tas Bambu',
-    harga: 50000,
-    deskripsi:
-        'Sebuah ole-oleh khas yang terbuat dari anyaman bambu ysng dibuat dengan tangan-tangan terampil',
-    id_desawisata: '2',
-    gambar: 'assets/images/produk.png',
-  ),
-  Produk(
-    nama: 'Gerabah',
-    harga: 20000,
-    deskripsi:
-        'Sebuah ole-oleh khas yang terbuat dari tanah liat ysng dibuat dengan tangan-tangan terampil',
-    id_desawisata: '3',
-    gambar: 'assets/images/produk.png',
-  ),
-];
-
-List<DesaWisata> dummyDesaWisata = [
-  DesaWisata(
-    id: 1,
-    nama: 'Desa Beraban',
-    alamat: 'Beraban, Tabanan',
-    gambar: 'assets/images/kuta.png',
-    deskripsi: 'deskripsi desa beraban',
-    kategori: 'berkembang',
-    kabupaten: 'Tabanan',
-  ),
-  DesaWisata(
-    id: 2,
-    nama: 'Desa Ubud',
-    alamat: 'Ubud, Gianyar',
-    gambar: 'assets/images/ubud.png',
-    deskripsi: 'deskripsi desa ubud',
-    kategori: 'maju',
-    kabupaten: 'Gianyar',
-  ),
-  DesaWisata(
-    id: 3,
-    nama: 'Desa Candikuning',
-    alamat: 'Candikuning, Tabanan',
-    gambar: 'assets/images/beratan.png',
-    deskripsi: 'deskripsi desa candikuning',
-    kategori: 'mandiri',
-    kabupaten: 'Tabanan',
-  ),
-];
-
 class _ProdukPageState extends State<ProdukPage> {
   String searchQuery = '';
+  List<Produk> produk = [];
+  Map<int, String> desaMap = {};
 
-  List<Produk> get filteredProduk {
-    return dummyProduk.where((produk) {
-      return produk.nama.toLowerCase().contains(searchQuery.toLowerCase());
-    }).toList();
+  @override
+  void initState() {
+    super.initState();
+    _fetchProduk();
+    _fetchDesaNames();
   }
 
-  String getDesaNama(int id) {
-    return dummyDesaWisata.firstWhere((desa) => desa.id == id).nama;
+  Future<void> _fetchProduk() async {
+    try {
+      final produk = await ApiService.fetchProduk();
+      setState(() {
+        this.produk = produk;
+      });
+    } catch (e) {
+      print('Error fetching Produk: $e');
+    }
+  }
+
+  Future<void> _fetchDesaNames() async {
+    try {
+      final desaWisataList = await ApiService().fetchDesaWisataList();
+      setState(() {
+        desaMap = {for (var item in desaWisataList) item.id: item.nama};
+      });
+    } catch (e) {
+      print('Error fetching Desa Names: $e');
+    }
+  }
+
+  List<Produk> get filteredProduk {
+    return produk.where((produk) {
+      return produk.nama.toLowerCase().contains(searchQuery.toLowerCase());
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Produk',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -92,56 +64,58 @@ class _ProdukPageState extends State<ProdukPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Kotak Pencarian
-            Container(
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(25),
+        child: produk.isEmpty && desaMap.isEmpty
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Kotak Pencarian
+                  Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        hintText: 'Cari',
+                        prefixIcon: Icon(Icons.search, color: Colors.grey),
+                        border: InputBorder.none,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredProduk.length,
+                      itemBuilder: (context, index) {
+                        var produk = filteredProduk[index];
+                        return CardProduk(
+                          produk: produk,
+                          desaMap: desaMap,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailProduk(
+                                    produk: produk,
+                                    namadesa: desaMap[produk.idDesawisata]),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-              child: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Cari',
-                  prefixIcon: Icon(Icons.search, color: Colors.grey),
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                ),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredProduk.length,
-                itemBuilder: (context, index) {
-                  var produk = filteredProduk[index];
-                  return CardProduk(
-                    produk: produk,
-                    getDesaNama: getDesaNama,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailProduk(
-                            produk: produk,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -149,13 +123,14 @@ class _ProdukPageState extends State<ProdukPage> {
 
 class CardProduk extends StatelessWidget {
   final Produk produk;
-  final String Function(int) getDesaNama;
   final VoidCallback onTap;
+  final Map<int, String> desaMap;
 
-  CardProduk({
+  const CardProduk({
+    super.key,
     required this.produk,
-    required this.getDesaNama,
     required this.onTap,
+    required this.desaMap,
   });
 
   @override
@@ -173,24 +148,32 @@ class CardProduk extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.2),
                 spreadRadius: 2,
                 blurRadius: 7,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                produk.gambar,
+              child: Image.network(
+                "http://192.168.43.155:3000/resource/desawisata/${produk.gambar}",
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/default_image.png',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             ),
             title: Text(produk.nama),
             subtitle: Row(
               children: [
-                Text(getDesaNama(int.parse(produk.id_desawisata))),
+                Text(desaMap[produk.idDesawisata] ?? 'Desa Tidak Diketahui'),
               ],
             ),
           ),

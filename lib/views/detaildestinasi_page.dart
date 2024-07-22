@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
+import 'package:sidewibali/models/review_model.dart';
+import 'package:sidewibali/services/api_service.dart';
+import 'package:sidewibali/utils/colors.dart';
+import 'package:sidewibali/views/formulasan_page.dart';
 
 class DetailDestinasi extends StatefulWidget {
   final Destinasi destinasi;
 
-  DetailDestinasi({required this.destinasi});
+  const DetailDestinasi({
+    super.key,
+    required this.destinasi,
+  });
 
   @override
   _DetailDestinasiState createState() => _DetailDestinasiState();
@@ -14,18 +20,9 @@ class DetailDestinasi extends StatefulWidget {
 class _DetailDestinasiState extends State<DetailDestinasi> {
   int likeCount = 120;
   bool isLiked = false;
-
-  final Map<int, String> categoryMap = {
-    1: 'Destinasi Wisata Air',
-    2: 'Destinasi Wisata Alam',
-    3: 'Destinasi Wisata Rekreasi'
-  };
-
-  final Map<int, String> desaMap = {
-    1: 'Desa Bedugul',
-    2: 'Desa Ubud',
-    3: 'Desa Kuta'
-  };
+  String desaName = '';
+  String categoryName = '';
+  late Future<List<ReviewDestinasi>> futureReview;
 
   void _toggleLike() {
     setState(() {
@@ -34,34 +31,68 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
     });
   }
 
-  void _share() {
-    Clipboard.setData(ClipboardData(text: "Link berbagi: https://google.com"))
-        .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Link telah disalin ke clipboard"),
-      ));
+  @override
+  void initState() {
+    super.initState();
+    _fetchDesaAndCategoryNames();
+    futureReview = ApiService().fetchReviewsDestinasi(widget.destinasi.id);
+  }
+
+  Future<void> _fetchDesaAndCategoryNames() async {
+    final desaName =
+        await ApiService().fetchNamaDesa(widget.destinasi.idDesawisata);
+    final categoryName = await ApiService()
+        .fetchKategoriDestinasiDetail(widget.destinasi.idKategoridestinasi);
+
+    setState(() {
+      this.desaName = desaName;
+      this.categoryName = categoryName;
     });
+  }
+
+  Future<Map<String, dynamic>?> _getAccountDetails(int id_akun) async {
+    try {
+      final userDetails = await ApiService.fetchAkunDetail(id_akun);
+      if (userDetails != null) {
+        return userDetails;
+      } else {
+        throw Exception('User details are null');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $e')),
+      );
+      return null;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
-                Image.asset(
+                Image.network(
                   widget.destinasi.gambar,
                   height: 400,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/default_image.png',
+                      height: 400,
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
                 Positioned(
                   top: 16,
                   left: 16,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -73,7 +104,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -84,7 +115,8 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                   top: 16,
                   right: 16,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
@@ -98,7 +130,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                           ),
                           onPressed: _toggleLike,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text('$likeCount Suka'),
                       ],
                     ),
@@ -114,105 +146,181 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                   Row(
                     children: [
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: Text(
-                          categoryMap[widget.destinasi.id_kategoridestinasi] ??
-                              'Kategori Tidak Diketahui',
-                        ),
+                        child: Text(categoryName),
                       ),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.share),
-                        onPressed: _share,
-                      ),
+                      const Spacer(),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     widget.destinasi.nama,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.grey),
-                      SizedBox(width: 4),
+                      const Icon(Icons.location_on, color: Colors.grey),
+                      const SizedBox(width: 4),
                       Text(
-                        desaMap[widget.destinasi.id_desawisata] ??
-                            'Desa Tidak Diketahui',
+                        desaName,
                         style: TextStyle(
                           color: Colors.grey[600],
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Deskripsi',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(widget.destinasi.deskripsi),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Rating',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber),
-                      Icon(Icons.star, color: Colors.amber),
-                      Icon(Icons.star, color: Colors.amber),
-                      Icon(Icons.star, color: Colors.amber),
-                      Icon(Icons.star_border, color: Colors.amber),
-                      SizedBox(width: 8),
-                      Text('4/5 (49 Penilaian)'),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Ulasan',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Review(
-                    username: 'Agus Prianta',
-                    rating: 4,
-                    comment: 'Suasana yang sejuk dan indah',
-                  ),
-                  Review(
-                    username: 'Dodek Alit',
-                    rating: 5,
-                    comment:
-                        'Nyaman banget tempatnya, bagus untuk piknik keluarga, pokoknya rekomen banget',
-                  ),
-                  Review(
-                    username: 'Ni Wayan Sari',
-                    rating: 5,
-                    comment: 'Tempat yang sangat nyaman untuk bersantai.',
-                  ),
-                  Review(
-                    username: 'Made Sudana',
-                    rating: 3,
-                    comment: 'Cukup baik, tapi bisa lebih ditingkatkan lagi.',
+                  const SizedBox(height: 4),
+                  FutureBuilder<List<ReviewDestinasi>>(
+                    future: futureReview,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Text('Belum ada ulasan');
+                      } else {
+                        final reviews = snapshot.data!;
+                        double averageRating = reviews
+                                .map((review) => review.rating)
+                                .reduce((a, b) => a + b) /
+                            reviews.length;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                ...List.generate(5, (index) {
+                                  return Icon(
+                                    index < averageRating
+                                        ? Icons.star
+                                        : Icons.star_border,
+                                    color: Colors.amber,
+                                  );
+                                }),
+                                const SizedBox(width: 8),
+                                Text(
+                                    '${averageRating.toStringAsFixed(1)}/5 (${reviews.length} Penilaian)'),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Ulasan',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: reviews.length,
+                              itemBuilder: (context, index) {
+                                final review = reviews[index];
+                                return FutureBuilder<Map<String, dynamic>?>(
+                                  future: _getAccountDetails(review.idAkun),
+                                  builder: (context, userSnapshot) {
+                                    if (userSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (userSnapshot.hasError) {
+                                      return Text(
+                                          'Error: ${userSnapshot.error}');
+                                    } else if (!userSnapshot.hasData) {
+                                      return const Text(
+                                          'Akun tidak ditemukan.');
+                                    } else {
+                                      final user = userSnapshot.data!;
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                user['foto'] ??
+                                                    'https://via.placeholder.com/50',
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Text(user['nama'],
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      const SizedBox(width: 8),
+                                                      Row(
+                                                        children: List.generate(
+                                                            5, (index) {
+                                                          return Icon(
+                                                            index <
+                                                                    review
+                                                                        .rating
+                                                                ? Icons.star
+                                                                : Icons
+                                                                    .star_border,
+                                                            color: Colors.amber,
+                                                            size: 16,
+                                                          );
+                                                        }),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(review.review),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -220,54 +328,18 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class Review extends StatelessWidget {
-  final String username;
-  final int rating;
-  final String comment;
-
-  Review({required this.username, required this.rating, required this.comment});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage('https://via.placeholder.com/50'),
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(username,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    SizedBox(width: 8),
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Icon(
-                          index < rating ? Icons.star : Icons.star_border,
-                          color: Colors.amber,
-                          size: 16,
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4),
-                Text(comment),
-              ],
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: primary,
+        foregroundColor: white,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FormUlasan(destinasi: widget.destinasi),
             ),
-          ),
-        ],
+          );
+        },
+        child: const Icon(Icons.rate_review),
       ),
     );
   }

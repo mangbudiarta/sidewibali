@@ -3,7 +3,6 @@ import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/login_page.dart';
 import 'package:sidewibali/models/user_model.dart';
 import 'package:sidewibali/services/api_service.dart';
-import 'dart:developer';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -15,11 +14,12 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Future<void> _register() async {
@@ -33,21 +33,21 @@ class _RegisterViewState extends State<RegisterView> {
         nama: name,
         email: email,
         password: password,
-        no_telp: phone,
+        noTelp: phone,
       );
       bool success = await ApiService.registerUser(newUser);
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration successful!')),
+          const SnackBar(content: Text('Registration successful!')),
         );
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => LoginView()),
+          MaterialPageRoute(builder: (context) => const LoginView()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed!')),
+          const SnackBar(content: Text('Registration failed!')),
         );
       }
     }
@@ -64,14 +64,14 @@ class _RegisterViewState extends State<RegisterView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
                 Center(
                   child: Image.asset(
                     'assets/images/logo_text_max.png',
                     width: 100,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: Text(
                     "Create an Account",
@@ -82,7 +82,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -91,8 +91,8 @@ class _RegisterViewState extends State<RegisterView> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -101,7 +101,7 @@ class _RegisterViewState extends State<RegisterView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -110,8 +110,8 @@ class _RegisterViewState extends State<RegisterView> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -123,7 +123,7 @@ class _RegisterViewState extends State<RegisterView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
@@ -148,8 +148,8 @@ class _RegisterViewState extends State<RegisterView> {
                         },
                       ),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -160,7 +160,7 @@ class _RegisterViewState extends State<RegisterView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: !_isConfirmPasswordVisible,
@@ -186,8 +186,8 @@ class _RegisterViewState extends State<RegisterView> {
                         },
                       ),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -198,7 +198,7 @@ class _RegisterViewState extends State<RegisterView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
                   decoration: InputDecoration(
@@ -207,8 +207,8 @@ class _RegisterViewState extends State<RegisterView> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -217,7 +217,7 @@ class _RegisterViewState extends State<RegisterView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 GestureDetector(
                   onTap: _register,
                   child: Container(
@@ -227,7 +227,7 @@ class _RegisterViewState extends State<RegisterView> {
                       color: primary,
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    child: Text(
+                    child: const Text(
                       "Sign Up",
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -238,12 +238,12 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         "Already have an account? ",
                         style: TextStyle(fontFamily: "nunito_regular"),
                       ),
@@ -252,7 +252,7 @@ class _RegisterViewState extends State<RegisterView> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LoginView()),
+                                builder: (context) => const LoginView()),
                           );
                         },
                         child: Text(
