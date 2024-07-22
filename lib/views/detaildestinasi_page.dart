@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
-import 'package:sidewibali/models/review_model.dart';
+import 'package:sidewibali/models/ulasan_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/formulasan_page.dart';
+import 'package:sidewibali/views/login_page.dart';
 
 class DetailDestinasi extends StatefulWidget {
   final Destinasi destinasi;
@@ -18,7 +20,8 @@ class DetailDestinasi extends StatefulWidget {
 }
 
 class _DetailDestinasiState extends State<DetailDestinasi> {
-  int likeCount = 120;
+  final ApiService apiService = ApiService();
+  int likeCount = 0;
   bool isLiked = false;
   String desaName = '';
   String categoryName = '';
@@ -36,6 +39,73 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
     super.initState();
     _fetchDesaAndCategoryNames();
     futureReview = ApiService().fetchReviewsDestinasi(widget.destinasi.id);
+    _fetchDestinasiFavorit(widget.destinasi.id);
+  }
+
+  Future<void> _toggleFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? userId = prefs.getInt('userId');
+
+    if (token == null || token.isEmpty || userId == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginView()),
+      );
+      return;
+    }
+
+    // Fetch current favorites
+    final List<int> favorites = await apiService.fetchMyDestinasiFavorite();
+    if (favorites.contains(widget.destinasi.id)) {
+      // Hapus dari favorite
+      final int idFavorit =
+          await ApiService().fetchIdByIdDestinasi(widget.destinasi.id);
+      final isUnlike = await apiService.deleteDestinasiFavorite(idFavorit);
+      if (isUnlike) {
+        setState(() {
+          isLiked = false;
+          likeCount--;
+        });
+      } else {
+        print("Gagal unlike");
+      }
+    } else {
+      // Tambahkan ke favorite
+      final isLike = await apiService.addDestinasiFavorite(widget.destinasi.id);
+      if (isLike) {
+        setState(() {
+          isLiked = true;
+          likeCount++;
+        });
+      } else {
+        print("Gagal like");
+      }
+    }
+  }
+
+  Future<void> _fetchDestinasiFavorit(int idDestinasiWisata) async {
+    try {
+      final favorites = await apiService.fetchMyDestinasiFavorite();
+      final favoritesDestinasi = await apiService.fetchAllDestinasiFavorite();
+
+      int count =
+          favoritesDestinasi.where((id) => id == idDestinasiWisata).length;
+
+      if (favorites.contains(idDestinasiWisata)) {
+        setState(() {
+          isLiked = true;
+          likeCount = count;
+        });
+      } else {
+        setState(() {
+          isLiked = false;
+          likeCount = count;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> _fetchDesaAndCategoryNames() async {
@@ -124,12 +194,13 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                     child: Row(
                       children: [
                         IconButton(
-                          icon: Icon(
-                            isLiked ? Icons.favorite : Icons.favorite_border,
-                            color: Colors.red,
-                          ),
-                          onPressed: _toggleLike,
-                        ),
+                            icon: Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              _toggleFavorite();
+                            }),
                         const SizedBox(width: 4),
                         Text('$likeCount Suka'),
                       ],
@@ -329,18 +400,18 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: primary,
-        foregroundColor: white,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FormUlasan(destinasi: widget.destinasi),
-            ),
-          );
-        },
-        child: const Icon(Icons.rate_review),
-      ),
+          backgroundColor: primary,
+          foregroundColor: white,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FormUlasan(destinasi: widget.destinasi),
+              ),
+            );
+          },
+          child: const Icon(Icons.rate_review),
+          shape: CircleBorder()),
     );
   }
 }

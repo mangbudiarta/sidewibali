@@ -9,7 +9,8 @@ import 'package:sidewibali/models/informasi_model.dart';
 import 'package:sidewibali/models/kategoridestinasi_model.dart';
 import 'package:sidewibali/models/paketwisata_model.dart';
 import 'package:sidewibali/models/produk_model.dart';
-import 'package:sidewibali/models/review_model.dart';
+import 'package:sidewibali/models/ulasan_model.dart';
+import 'package:sidewibali/models/notifikasi_model.dart';
 import 'dart:convert';
 import '../models/user_model.dart';
 
@@ -184,7 +185,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untek mendapatkan semua data destinasi wisata
+  // Fungsi untek mendapatkan data destinasi wisata berdasarkan id
   Future<List<Destinasi>> fetchDestinasiWisata(int idDesaWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -344,7 +345,6 @@ class ApiService {
       Uri.parse('$_baseUrl/paketwisata'),
       headers: {'Authorization': 'Bearer $token'},
     );
-    print(response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -378,7 +378,6 @@ class ApiService {
       Uri.parse('$_baseUrl/produk'),
       headers: {'Authorization': 'Bearer $token'},
     );
-    print(response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -396,13 +395,267 @@ class ApiService {
       Uri.parse('$_baseUrl/berita'),
       headers: {'Authorization': 'Bearer $token'},
     );
-    print(response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((item) => Berita.fromJson(item)).toList();
     } else {
       throw Exception('Failed to load destinations');
+    }
+  }
+
+  static Future<List<ReviewDestinasi>> fetchReviewDestinasi() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    final response = await http.get(
+      Uri.parse('$_baseUrl/reviewdestinasi'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((item) => ReviewDestinasi.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load reviews');
+    }
+  }
+
+// Fungsi untek mendapatkan data notifikasi berdasrkan idAkun
+  Future<List<Notifikasi>> fetchNotifikasi() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? idAkun = prefs.getInt('userId');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/notifikasi/akun/$idAkun'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => Notifikasi.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load notifikasi');
+    }
+  }
+
+  Future<bool> updateStatusNotifikasi(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    final response = await http.patch(Uri.parse('$_baseUrl/notifikasi/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'status': 1,
+        }));
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> addDesaFavorite(int idDesaWisata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? idAkun = prefs.getInt('userId');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/desafavorit/add'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'id_akun': idAkun,
+        'id_desawisata': idDesaWisata,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> deleteDesaFavorite(int idFavorit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/desafavorit/$idFavorit'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<List<int>> fetchMyDesaFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? idAkun = prefs.getInt('userId');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/desafavorit/akun/$idAkun'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      return data.map<int>((item) => item['id_desawisata'] as int).toList();
+    } else {
+      throw Exception('Failed to load favorites');
+    }
+  }
+
+  Future<List<int>> fetchAllDesaFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/desafavorit'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      return data.map<int>((item) => item['id_desawisata'] as int).toList();
+    } else {
+      throw Exception('Failed to load favorites');
+    }
+  }
+
+  Future<int> fetchIdByIdDesa(int idDesaWisata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? idAkun = prefs.getInt('userId');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/desafavorit/akun/$idAkun'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      // Mencari objek dengan id_desawisata yang sesuai
+      var target =
+          data.firstWhere((item) => item['id_desawisata'] == idDesaWisata);
+      return target['id'] as int;
+    } else {
+      throw Exception('Failed to load favorites');
+    }
+  }
+
+  Future<bool> addDestinasiFavorite(int idDestinasiWisata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? idAkun = prefs.getInt('userId');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/destinasifavorit/add'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'id_akun': idAkun,
+        'id_destinasiwisata': idDestinasiWisata,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> deleteDestinasiFavorite(int idFavorit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/destinasifavorit/$idFavorit'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<List<int>> fetchMyDestinasiFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? idAkun = prefs.getInt('userId');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/destinasifavorit/akun/$idAkun'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      return data
+          .map<int>((item) => item['id_destinasiwisata'] as int)
+          .toList();
+    } else {
+      throw Exception('Failed to load favorites');
+    }
+  }
+
+  Future<List<int>> fetchAllDestinasiFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/destinasifavorit'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      return data
+          .map<int>((item) => item['id_destinasiwisata'] as int)
+          .toList();
+    } else {
+      throw Exception('Failed to load favorites');
+    }
+  }
+
+  Future<int> fetchIdByIdDestinasi(int idDestinasiWisata) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? idAkun = prefs.getInt('userId');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/destinasifavorit/akun/$idAkun'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      // Mencari objek dengan id_desawisata yang sesuai
+      var target = data.firstWhere(
+          (item) => item['id_destinasiwisata'] == idDestinasiWisata);
+      return target['id'] as int;
+    } else {
+      throw Exception('Failed to load favorites');
     }
   }
 }

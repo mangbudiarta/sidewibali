@@ -29,7 +29,7 @@ class _ProdukPageState extends State<ProdukPage> {
         this.produk = produk;
       });
     } catch (e) {
-      print('Error fetching Produk: $e');
+      print(e);
     }
   }
 
@@ -40,7 +40,7 @@ class _ProdukPageState extends State<ProdukPage> {
         desaMap = {for (var item in desaWisataList) item.id: item.nama};
       });
     } catch (e) {
-      print('Error fetching Desa Names: $e');
+      print(e);
     }
   }
 
@@ -156,7 +156,7 @@ class CardProduk extends StatelessWidget {
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                "http://192.168.43.155:3000/resource/desawisata/${produk.gambar}",
+                "http://192.168.43.155:3000/resource/produk/${produk.gambar}",
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,

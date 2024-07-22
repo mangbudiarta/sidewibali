@@ -68,18 +68,18 @@ class DetailBerita extends StatelessWidget {
                 children: [
                   const SizedBox(height: 10),
                   Text(
-                    '$formattedDate',
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
                     berita.judul,
                     style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '$formattedDate',
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.grey,
                     ),
                   ),
                   const SizedBox(height: 10),

@@ -15,6 +15,7 @@ class BeritaPage extends StatefulWidget {
 class _BeritaPageState extends State<BeritaPage> {
   List<Berita> beritaList = [];
   String searchQuery = '';
+  final DateFormat dateFormat = DateFormat('dd MMMM yyyy');
 
   @override
   void initState() {
@@ -147,15 +148,28 @@ class _BeritaPageState extends State<BeritaPage> {
                                     bottomRight: Radius.circular(20),
                                   ),
                                 ),
-                                child: Text(
-                                  berita.judul.length > 50
-                                      ? '${berita.judul.substring(0, 50)}...'
-                                      : berita.judul,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      berita.judul.length > 50
+                                          ? '${berita.judul.substring(0, 50)}...'
+                                          : berita.judul,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat('dd MMM yyyy')
+                                          .format(berita.createdAt),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

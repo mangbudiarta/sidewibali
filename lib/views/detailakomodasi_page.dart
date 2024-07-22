@@ -143,7 +143,7 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
                           children: [
                             const SizedBox(height: 16),
                             const Text(
-                              'Informasi AKomodasi',
+                              'Informasi Akomodasi',
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold),
                             ),

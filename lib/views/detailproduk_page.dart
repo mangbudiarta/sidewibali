@@ -41,7 +41,7 @@ class _DetailProdukState extends State<DetailProduk> {
             Stack(
               children: [
                 Image.network(
-                  "http://192.168.43.155:3000/resource/desawisata/${widget.produk.gambar}",
+                  "http://192.168.43.155:3000/resource/produk/${widget.produk.gambar}",
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 400,

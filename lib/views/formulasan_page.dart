@@ -4,7 +4,7 @@ import 'package:sidewibali/models/destinasi_model.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/login_page.dart';
 import 'package:sidewibali/services/api_service.dart';
-import 'package:sidewibali/models/review_model.dart';
+import 'package:sidewibali/models/ulasan_model.dart';
 
 class FormUlasan extends StatefulWidget {
   final Destinasi destinasi;
@@ -24,10 +24,10 @@ class _FormUlasanState extends State<FormUlasan> {
   @override
   void initState() {
     super.initState();
-    _checkTokenAndId();
+    _cekLogin();
   }
 
-  Future<void> _checkTokenAndId() async {
+  Future<void> _cekLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     int? id = prefs.getInt('userId');
@@ -37,11 +37,6 @@ class _FormUlasanState extends State<FormUlasan> {
         context,
         MaterialPageRoute(builder: (context) => LoginView()),
       );
-    } else {
-      setState(() {
-        _token = token;
-        _idAkun = id;
-      });
     }
   }
 
