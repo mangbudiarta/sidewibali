@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import paket intl
+import 'package:intl/intl.dart';
 import 'package:sidewibali/models/berita_model.dart';
 import 'package:sidewibali/utils/colors.dart';
 
