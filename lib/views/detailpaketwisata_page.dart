@@ -95,7 +95,7 @@ class _DetailPaketwisataState extends State<DetailPaketwisata> {
                       Text(
                         'Rp. ${widget.paketWisata.harga}',
                         style: const TextStyle(
-                          color: Colors.black,
+                          color: Color.fromARGB(255, 0, 194, 204),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
