@@ -7,10 +7,10 @@ class DestinasiPage extends StatefulWidget {
   const DestinasiPage({super.key});
 
   @override
-  _SearchPageStateDestinasi createState() => _SearchPageStateDestinasi();
+  _DestinasiPageState createState() => _DestinasiPageState();
 }
 
-class _SearchPageStateDestinasi extends State<DestinasiPage> {
+class _DestinasiPageState extends State<DestinasiPage> {
   String selectedCategory = 'Semua';
   String searchQuery = '';
 
@@ -28,7 +28,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
   }
 
   Future<void> _fetchDestinations() async {
-    final destinations = await ApiService.fetchDestinations();
+    final destinations = await ApiService.fetchDestinasi();
     setState(() {
       this.destinations = destinations;
     });
@@ -58,7 +58,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
   List<Destinasi> get filteredDestinations {
     return destinations.where((destination) {
       bool matchesCategory = selectedCategory == 'Semua' ||
-          categoryMap[destination.id_kategoridestinasi] == selectedCategory;
+          categoryMap[destination.idKategoridestinasi] == selectedCategory;
       bool matchesSearch = searchQuery.isEmpty ||
           destination.nama.toLowerCase().contains(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
@@ -192,7 +192,7 @@ class _SearchPageStateDestinasi extends State<DestinasiPage> {
             subtitle: Row(
               children: [
                 Text(
-                  desaMap[destination.id_desawisata] ?? 'Desa Tidak Diketahui',
+                  desaMap[destination.idDesawisata] ?? 'Desa Tidak Diketahui',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ],

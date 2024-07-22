@@ -1,20 +1,9 @@
 import 'package:flutter/material.dart';
-
-class Berita {
-  final String judul;
-  final String isi_berita;
-  final String gambar;
-  final int id_desawisata;
-  final DateTime timestamp;
-
-  Berita({
-    required this.judul,
-    required this.isi_berita,
-    required this.gambar,
-    required this.id_desawisata,
-    required this.timestamp,
-  });
-}
+import 'package:intl/intl.dart';
+import 'package:sidewibali/models/berita_model.dart'; 
+import 'package:sidewibali/services/api_service.dart';
+import 'package:sidewibali/utils/colors.dart';
+import 'package:sidewibali/views/detailberita_page.dart';
 
 class BeritaPage extends StatefulWidget {
   const BeritaPage({super.key});
@@ -24,55 +13,41 @@ class BeritaPage extends StatefulWidget {
 }
 
 class _BeritaPageState extends State<BeritaPage> {
-  List<Berita> dummyBerita = [
-    Berita(
-      judul:
-          '19 Festival Akan Digelar Di Bali Pada Agustus 2024, Termasuk Rare Angon Kite Festival',
-      isi_berita:
-          'Pada Agustus 2024, Bali akan menjadi tuan rumah bagi 19 festival menarik yang menampilkan kekayaan budaya, seni, dan tradisi pulau ini...',
-      gambar: 'assets/images/news.png',
-      id_desawisata: 1,
-      timestamp: DateTime(2024, 7, 10),
-    ),
-    Berita(
-      judul: 'Pembukaan Festival Budaya',
-      isi_berita:
-          'Pada Agustus 2024, Bali akan menyelenggarakan 19 festival budaya yang luar biasa...',
-      gambar: 'assets/images/news.png',
-      id_desawisata: 2,
-      timestamp: DateTime(2024, 7, 8),
-    ),
-    Berita(
-      judul: 'Festival Lomba Tari Bali',
-      isi_berita:
-          'Pada Agustus 2024, Bali akan menggelar 19 festival budaya yang meriah...',
-      gambar: 'assets/images/news.png',
-      id_desawisata: 3,
-      timestamp: DateTime(2024, 7, 9),
-    ),
-  ];
-
-  final Map<int, String> desaMap = {
-    1: 'Desa Bedugul',
-    2: 'Desa Ubud',
-    3: 'Desa Kuta'
-  };
-
+  List<Berita> beritaList = [];
   String searchQuery = '';
+  final DateFormat dateFormat = DateFormat('dd MMMM yyyy');
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBerita();
+  }
+
+  Future<void> _loadBerita() async {
+    try {
+      final berita = await ApiService.fetchBerita();
+      print('Berita Data: $berita');
+      setState(() {
+        beritaList = berita;
+      });
+    } catch (e) {
+      // Handle error
+      print('Failed to load berita: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
 
-    var filteredList = dummyBerita
+    var filteredList = beritaList
         .where((berita) =>
             berita.judul.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
-
-    // Sort the filtered list by timestamp in descending order
-    filteredList.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    filteredList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
         title: const Text(
           'Berita',
@@ -122,7 +97,6 @@ class _BeritaPageState extends State<BeritaPage> {
                         MaterialPageRoute(
                           builder: (context) => DetailBerita(
                             berita: berita,
-                            desaMap: desaMap,
                           ),
                         ),
                       );
@@ -146,11 +120,19 @@ class _BeritaPageState extends State<BeritaPage> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(20),
-                              child: Image.asset(
-                                berita.gambar,
+                              child: Container(
                                 width: double.infinity,
                                 height: 200,
-                                fit: BoxFit.cover,
+                                child: Image.network(
+                                  "http://192.168.43.155:3000/resource/berita/${berita.gambar}",
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/default_image.png',
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             Positioned(
@@ -166,15 +148,28 @@ class _BeritaPageState extends State<BeritaPage> {
                                     bottomRight: Radius.circular(20),
                                   ),
                                 ),
-                                child: Text(
-                                  berita.judul.length > 50
-                                      ? '${berita.judul.substring(0, 50)}...'
-                                      : berita.judul,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      berita.judul.length > 50
+                                          ? '${berita.judul.substring(0, 50)}...'
+                                          : berita.judul,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat('dd MMM yyyy')
+                                          .format(berita.createdAt),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -185,46 +180,6 @@ class _BeritaPageState extends State<BeritaPage> {
                   );
                 },
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DetailBerita extends StatelessWidget {
-  final Berita berita;
-  final Map<int, String> desaMap;
-
-  const DetailBerita({super.key, required this.berita, required this.desaMap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(berita.judul),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(berita.gambar),
-            const SizedBox(height: 16.0),
-            Text(
-              berita.judul,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              'Desa: ${desaMap[berita.id_desawisata]}',
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              berita.isi_berita,
-              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),

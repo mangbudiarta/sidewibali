@@ -5,7 +5,8 @@ class RecommendationCard extends StatelessWidget {
   final String nama;
   final String id_desawisata;
 
-  const RecommendationCard({super.key, 
+  const RecommendationCard({
+    super.key,
     required this.gambar,
     required this.nama,
     required this.id_desawisata,
@@ -14,7 +15,7 @@ class RecommendationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -57,7 +58,8 @@ class RecommendationCard extends StatelessWidget {
                     const SizedBox(height: 8.0),
                     Row(
                       children: [
-                        const Icon(Icons.location_on, size: 16.0, color: Colors.grey),
+                        const Icon(Icons.location_on,
+                            size: 16.0, color: Colors.grey),
                         const SizedBox(width: 4.0),
                         Text(id_desawisata,
                             style: const TextStyle(color: Colors.grey)),

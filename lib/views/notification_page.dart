@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:sidewibali/models/notifikasi_model.dart';
+import 'package:sidewibali/services/api_service.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -8,11 +11,24 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  List<Map<String, dynamic>> notifikasiList = [
-    {"deskripsi": "Selamat Datang Pengguna Baru", "bold": false},
-    {"deskripsi": "Pemberitahuan Update Aplikasi", "bold": true},
-    {"deskripsi": "Yuk ajak temanmu pakai Sidewi Bali", "bold": false},
-  ];
+  late Future<List<Notifikasi>> _NotifikasiFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _NotifikasiFuture = ApiService().fetchNotifikasi();
+  }
+
+  Future<void> _updateStatus(int id) async {
+    bool response = await ApiService().updateStatusNotifikasi(id);
+    if (response) {
+      setState(() {
+        _NotifikasiFuture = ApiService().fetchNotifikasi();
+      });
+    } else {
+      print('Gagal update status');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,52 +36,67 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         title: const Text('Notifikasi'),
         centerTitle: true,
-        backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
-      body: ListView.builder(
-        itemCount: notifikasiList.length,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              if (index > 0)
-                Divider(
-                    height: 0.5,
-                    color: Colors.grey[300]), // Garis pembatas tipis
-              ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                title: Text(
-                  notifikasiList[index]["deskripsi"],
-                  style: TextStyle(
-                    fontWeight: notifikasiList[index]["bold"]
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: notifikasiList[index]["bold"]
-                        ? Colors.black
-                        : Colors.grey[700], // Warna abu-abu yang lebih gelap
-                  ),
-                ),
-                onTap: () {
-                  setState(() {
-                    if (notifikasiList[index]["bold"]) {
-                      notifikasiList[index]["bold"] =
-                          !notifikasiList[index]["bold"];
-                    }
-                  });
-                },
-              ),
-            ],
-          );
+      body: FutureBuilder<List<Notifikasi>>(
+        future: _NotifikasiFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('Tidak ada notifikasi'));
+          } else {
+            final notifikasiList = snapshot.data!;
+            notifikasiList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+            return ListView.builder(
+              itemCount: notifikasiList.length,
+              itemBuilder: (context, index) {
+                final notifikasi = notifikasiList[index];
+                final createdAt = notifikasi.createdAt;
+                final formattedDate =
+                    DateFormat('dd MMMM yyyy, HH:mm').format(createdAt);
+
+                return Column(
+                  children: [
+                    if (index > 0)
+                      Divider(height: 0.5, color: Colors.grey[300]),
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      title: Text(
+                        notifikasi.deskripsi,
+                        style: TextStyle(
+                          fontWeight: notifikasi.status
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: notifikasi.status
+                              ? Colors.black
+                              : Colors.grey[700],
+                        ),
+                      ),
+                      subtitle: Text(
+                        formattedDate,
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                      onTap: () {
+                        if (notifikasi.status) {
+                          _updateStatus(notifikasi.id);
+                        }
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }
         },
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: NotificationPage(),
-  ));
 }

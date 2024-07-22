@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
+import 'package:sidewibali/models/paketwisata_model.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
 import 'package:sidewibali/views/listdesa_page.dart';
@@ -17,18 +19,32 @@ import 'package:sidewibali/views/notification_page.dart';
 import 'package:sidewibali/views/profile_page.dart';
 import 'package:sidewibali/views/website_page.dart';
 import 'package:sidewibali/widgets/menu_item.dart';
+import 'package:sidewibali/views/detailpaketwisata.dart';
 
 class HomePage extends StatefulWidget {
-  final Map<String, dynamic> userDetails;
-  const HomePage({super.key, required this.userDetails});
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
+// class PaketWisata {
+//   final String gambar;
+//   final String nama;
+//   final int harga;
+
+//   PaketWisata({
+//     required this.gambar,
+//     required this.nama,
+//     required this.harga,
+//   });
+// }
+
 class _HomePageState extends State<HomePage> {
+  bool isLoggedIn = false;
   int _selectedIndex = 0;
   List<Destinasi> _recommendedPlaces = [];
+  List<PaketWisata> _paketWisataList = [];
   List<String> _carouselImages = [];
 
   Map<int, String> kategoriMap = {
@@ -47,6 +63,7 @@ class _HomePageState extends State<HomePage> {
     'assets/images/beratan.png',
     'assets/images/kuta.png',
     'assets/images/ubud.png',
+    'assets/images/kuta.png',
   ];
 
   List<Destinasi> dummyRecommendedPlaces = [
@@ -56,8 +73,8 @@ class _HomePageState extends State<HomePage> {
       nama: 'Danau Beratan',
       deskripsi:
           'Danau beratan merupakan sebuah destinasi yang ada di desa candikuning. Destinasi ini sering dikunjungi wisatawan',
-      id_kategoridestinasi: 3,
-      id_desawisata: 1,
+      idKategoridestinasi: 3,
+      idDesawisata: 1,
     ),
     Destinasi(
       id: 2,
@@ -65,16 +82,42 @@ class _HomePageState extends State<HomePage> {
       nama: 'Puri Ubud',
       deskripsi:
           'Puri Ubud merupakan sebuah tempat yang terkenal di Ubud hingga dunia. Puri Ubud merupakan tempat tinggal dari Raja Ubud',
-      id_kategoridestinasi: 1,
-      id_desawisata: 2,
+      idKategoridestinasi: 1,
+      idDesawisata: 2,
     ),
     Destinasi(
       id: 3,
       gambar: 'assets/images/kuta.png',
       nama: 'Kuta',
       deskripsi: 'Pantai terkenal dengan ombak dan kehidupan malamnya.',
-      id_kategoridestinasi: 2,
-      id_desawisata: 3,
+      idKategoridestinasi: 2,
+      idDesawisata: 3,
+    ),
+  ];
+
+  List<PaketWisata> dummyPaketWisataList = [
+    PaketWisata(
+      nama: 'Paket Premium',
+      harga: 100000,
+      deskripsi:
+          'Paket yang cocok untuk pengalaman wisata yang berkualitas dengan pelayanan terbaik.',
+      id_desawisata: '1',
+      gambar: 'assets/images/produk.png',
+    ),
+    PaketWisata(
+      nama: 'Paket Keluarga',
+      harga: 50000,
+      deskripsi:
+          'Paket yang cocok untuk pengalaman wisata yang bersama keluarga dengan harga spesial.',
+      id_desawisata: '2',
+      gambar: 'assets/images/produk.png',
+    ),
+    PaketWisata(
+      nama: 'Paket Hari Raya',
+      harga: 20000,
+      deskripsi: 'Paket yang cocok untuk pengalaman wisata saat hari raya.',
+      id_desawisata: '3',
+      gambar: 'assets/images/produk.png',
     ),
   ];
 
@@ -83,20 +126,31 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _carouselImages = dummyCarouselImages;
     _recommendedPlaces = dummyRecommendedPlaces;
+    _paketWisataList = dummyPaketWisataList;
+    _checkLoginStatus();
   }
 
-  List<Widget> _widgetOptions(Map<String, dynamic> userDetails) {
-    bool isLoggedIn = userDetails.containsKey('id') &&
-        userDetails['id'] != null &&
-        userDetails.containsKey('token') &&
-        userDetails['token'] != null;
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? token = preferences.getString('token');
+    int? userId = preferences.getInt('userId');
 
+    setState(() {
+      if (token != null && userId != null) {
+        isLoggedIn = true;
+      } else {
+        isLoggedIn = false;
+      }
+    });
+  }
+
+  List<Widget> _widgetOptions() {
     if (isLoggedIn) {
       return <Widget>[
         const MainPage(),
         const FavoritePage(),
         const NotificationPage(),
-        ProfilPage(userDetails: userDetails),
+        ProfilPage(),
       ];
     } else {
       return <Widget>[
@@ -141,7 +195,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: _widgetOptions(widget.userDetails).elementAt(_selectedIndex),
+      body: _widgetOptions().elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: primary,
@@ -242,9 +296,9 @@ class MainPage extends StatelessWidget {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              screenSize.width * 0.07,
+              screenSize.width * 0.05,
               screenSize.height * 0.01,
-              screenSize.width * 0.07,
+              screenSize.width * 0.05,
               screenSize.height * 0.01,
             ),
             child: Column(
@@ -275,8 +329,37 @@ class MainPage extends StatelessWidget {
                         gambar: place.gambar,
                         nama: place.nama,
                         id_desawisata:
-                            homePageState.desaMap[place.id_desawisata] ??
+                            homePageState.desaMap[place.idDesawisata] ??
                                 'Unknown',
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const Text(
+                  'Paket Wisata',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: screenSize.height * 0.01),
+                Column(
+                  children: _homePageState._paketWisataList.map((paket) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailPaketwisata(
+                              paketWisata: paket,
+                            ),
+                          ),
+                        );
+                      },
+                      child: PaketWisataCard(
+                        gambar: paket.gambar,
+                        nama: paket.nama,
+                        harga: paket.harga,
                       ),
                     );
                   }).toList(),
@@ -285,6 +368,67 @@ class MainPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PaketWisataCard extends StatelessWidget {
+  final String gambar;
+  final String nama;
+  final int harga;
+
+  const PaketWisataCard({
+    required this.gambar,
+    required this.nama,
+    required this.harga,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.01),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Image.asset(
+                gambar,
+                width: screenSize.width * 0.3,
+                height: screenSize.height * 0.15,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(width: screenSize.width * 0.05),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nama,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: screenSize.height * 0.01),
+                Text(
+                  'Rp ${harga.toString()}',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

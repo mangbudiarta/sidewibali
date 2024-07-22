@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/akomodasi_model.dart';
 import 'package:sidewibali/models/desawisata_model.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
-import 'package:sidewibali/models/informasi_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/views/detailakomodasi_page.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
 import 'package:sidewibali/widgets/informasi_kontak.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sidewibali/views/login_page.dart';
 
 class DetailDesa extends StatefulWidget {
   final DesaWisata desa;
@@ -22,7 +23,7 @@ class DetailDesa extends StatefulWidget {
 
 class _DetailDesaState extends State<DetailDesa> {
   final ApiService apiService = ApiService();
-  int likeCount = 120;
+  int likeCount = 0;
   bool isLiked = false;
 
   String email = '';
@@ -43,13 +44,71 @@ class _DetailDesaState extends State<DetailDesa> {
     _fetchDestinasiWisata(widget.desa.id);
     _fetchAkomodasi(widget.desa.id);
     _fetchDesaWisataLainnya();
+    _fetchDesaWisataFavorit(widget.desa.id);
   }
 
-  void _toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-      likeCount += isLiked ? 1 : -1;
-    });
+  Future<void> _toggleFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    int? userId = prefs.getInt('userId');
+
+    if (token == null || token.isEmpty || userId == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginView()),
+      );
+      return;
+    }
+
+    // Fetch current favorites
+    final List<int> favorites = await apiService.fetchMyDesaFavorite();
+    if (favorites.contains(widget.desa.id)) {
+      // Hapus dari favorite
+      final int idFavorit = await ApiService().fetchIdByIdDesa(widget.desa.id);
+      final isUnlike = await apiService.deleteDesaFavorite(idFavorit);
+      if (isUnlike) {
+        setState(() {
+          isLiked = false;
+          likeCount--;
+        });
+      } else {
+        print("Gagal unlike");
+      }
+    } else {
+      // Tambahkan ke favorite
+      final isLike = await apiService.addDesaFavorite(widget.desa.id);
+      if (isLike) {
+        setState(() {
+          isLiked = true;
+          likeCount++;
+        });
+      } else {
+        print("Gagal like");
+      }
+    }
+  }
+
+  Future<void> _fetchDesaWisataFavorit(int idDesaWisata) async {
+    try {
+      final favorites = await apiService.fetchMyDesaFavorite();
+      final favoritesDesa = await apiService.fetchAllDesaFavorite();
+
+      int count = favoritesDesa.where((id) => id == idDesaWisata).length;
+
+      if (favorites.contains(idDesaWisata)) {
+        setState(() {
+          isLiked = true;
+          likeCount = count;
+        });
+      } else {
+        setState(() {
+          isLiked = false;
+          likeCount = count;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   void _share(String linkWebsite) {
@@ -81,31 +140,28 @@ class _DetailDesaState extends State<DetailDesa> {
       });
     } catch (e) {
       print(e);
-      // Handle error here
     }
   }
 
   Future<void> _fetchDestinasiWisata(int idDesaWisata) async {
     try {
       final data = await apiService.fetchDestinasiWisata(idDesaWisata);
-      print("Destinasi Wisata Data: $data"); // Cetak data
       setState(() {
         destinasiWisata = data;
       });
     } catch (e) {
-      print("Error fetching Destinasi Wisata: $e");
+      print(e);
     }
   }
 
   Future<void> _fetchAkomodasi(int idDesaWisata) async {
     try {
       final data = await apiService.fetchAkomodasi(idDesaWisata);
-      print("Akomodasi Data: $data"); // Cetak data
       setState(() {
         akomodasi = data;
       });
     } catch (e) {
-      print("Error fetching Akomodasi: $e");
+      print(e);
     }
   }
 
@@ -117,7 +173,6 @@ class _DetailDesaState extends State<DetailDesa> {
       });
     } catch (e) {
       print(e);
-      // Handle error here
     }
   }
 
@@ -183,7 +238,9 @@ class _DetailDesaState extends State<DetailDesa> {
                             isLiked ? Icons.favorite : Icons.favorite_border,
                             color: Colors.red,
                           ),
-                          onPressed: _toggleLike,
+                          onPressed: () {
+                            _toggleFavorite();
+                          },
                         ),
                         const SizedBox(width: 4),
                         Text('$likeCount Suka'),
@@ -472,7 +529,7 @@ class WisataCard extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => DetailDestinasi(
               destinasi: destinasi,
-            ), // Navigasi ke DetailAkomodasi
+            ),
           ),
         );
       },
@@ -514,13 +571,13 @@ class WisataCard extends StatelessWidget {
 class AkomodasiCard extends StatelessWidget {
   final String imageUrl;
   final String title;
-  final Akomodasi akomodasi; // Tambahkan parameter ini
+  final Akomodasi akomodasi;
 
   const AkomodasiCard({
     super.key,
     required this.imageUrl,
     required this.title,
-    required this.akomodasi, // Tambahkan parameter ini
+    required this.akomodasi,
   });
 
   @override
@@ -530,8 +587,7 @@ class AkomodasiCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailAkomodasi(
-                akomodasi: akomodasi), // Navigasi ke DetailAkomodasi
+            builder: (context) => DetailAkomodasi(akomodasi: akomodasi),
           ),
         );
       },

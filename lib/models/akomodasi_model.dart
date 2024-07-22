@@ -3,14 +3,14 @@ class Akomodasi {
   final String gambar;
   final String nama;
   final String kategori;
-  final int id_desawisata;
+  final int idDesawisata;
 
   Akomodasi({
     required this.id,
     required this.gambar,
     required this.nama,
     required this.kategori,
-    required this.id_desawisata,
+    required this.idDesawisata,
   });
 
   factory Akomodasi.fromJson(Map<String, dynamic> json) {
@@ -19,6 +19,6 @@ class Akomodasi {
         gambar: json['gambar'],
         nama: json['nama'],
         kategori: json['kategori'],
-        id_desawisata: json['id_desawisata']);
+        idDesawisata: json['id_desawisata']);
   }
 }
