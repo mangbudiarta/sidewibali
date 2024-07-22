@@ -19,7 +19,7 @@ import 'package:sidewibali/views/notification_page.dart';
 import 'package:sidewibali/views/profile_page.dart';
 import 'package:sidewibali/views/website_page.dart';
 import 'package:sidewibali/widgets/menu_item.dart';
-import 'package:sidewibali/views/detailpaketwisata.dart';
+import 'package:sidewibali/views/detailpaketwisata_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -101,23 +101,26 @@ class _HomePageState extends State<HomePage> {
       harga: 100000,
       deskripsi:
           'Paket yang cocok untuk pengalaman wisata yang berkualitas dengan pelayanan terbaik.',
-      id_desawisata: '1',
+      idDesawisata: 1,
       gambar: 'assets/images/produk.png',
+      id: 1,
     ),
     PaketWisata(
       nama: 'Paket Keluarga',
       harga: 50000,
       deskripsi:
           'Paket yang cocok untuk pengalaman wisata yang bersama keluarga dengan harga spesial.',
-      id_desawisata: '2',
+      idDesawisata: 2,
       gambar: 'assets/images/produk.png',
+      id: 2,
     ),
     PaketWisata(
       nama: 'Paket Hari Raya',
       harga: 20000,
       deskripsi: 'Paket yang cocok untuk pengalaman wisata saat hari raya.',
-      id_desawisata: '3',
+      idDesawisata: 3,
       gambar: 'assets/images/produk.png',
+      id: 3,
     ),
   ];
 
@@ -344,7 +347,7 @@ class MainPage extends StatelessWidget {
                 ),
                 SizedBox(height: screenSize.height * 0.01),
                 Column(
-                  children: _homePageState._paketWisataList.map((paket) {
+                  children: homePageState._paketWisataList.map((paket) {
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -352,6 +355,7 @@ class MainPage extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => DetailPaketwisata(
                               paketWisata: paket,
+                              namadesa: '',
                             ),
                           ),
                         );
