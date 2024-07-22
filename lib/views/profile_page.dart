@@ -85,7 +85,6 @@ class _ProfilPageState extends State<ProfilPage> {
         child: AppBar(
           title: const Text('Profile'),
           centerTitle: true,
-          backgroundColor: Colors.white,
           elevation: 0,
           automaticallyImplyLeading: false,
         ),

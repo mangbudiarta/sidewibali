@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sidewibali/models/destinasi_model.dart';
+import 'package:sidewibali/models/ulasan_model.dart';
+import 'package:sidewibali/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sidewibali/views/detaildestinasi_page.dart';
 
 class UlasanPage extends StatefulWidget {
   const UlasanPage({super.key});
@@ -11,63 +16,118 @@ class _UlasanPageState extends State<UlasanPage> {
   String selectedFilter = 'Semua';
   String searchQuery = '';
   List<String> filters = ['Semua', '⭐1', '⭐2', '⭐3', '⭐4', '⭐5'];
+  Map<int, String> desaMap = {};
+  List<Destinasi> destinations = [];
+  List<ReviewDestinasi> reviews = [];
 
-  List<Map<String, dynamic>> destinations = [
-    {
-      'image': 'assets/images/beratan.png',
-      'name': 'Kebun Raya Bedugul',
-      'location': 'Desa Wisata Candikuning',
-      'rating': 5,
-      'reviews': 20
-    },
-    {
-      'image': 'assets/images/ubud.png',
-      'name': 'Puri Ubud',
-      'location': 'Desa Wisata Ubud',
-      'rating': 4.7,
-      'reviews': 26
-    },
-    {
-      'image': 'assets/images/beratan.png',
-      'name': 'Wisata Tracking',
-      'location': 'Desa Wisata Taro',
-      'rating': 4.2,
-      'reviews': 40
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchDestinations();
+    _fetchReviews();
+    _fetchDesaNames();
+  }
 
-  List<Map<String, dynamic>> getFilteredDestinations() {
-    List<Map<String, dynamic>> filteredDestinations = destinations;
+  Future<void> _fetchDestinations() async {
+    final destinations = await ApiService.fetchDestinasi();
+    setState(() {
+      this.destinations = destinations;
+    });
+  }
 
+  Future<void> _fetchReviews() async {
+    final reviews = await ApiService.fetchReviewDestinasi();
+    setState(() {
+      this.reviews = reviews;
+    });
+  }
+
+  Future<void> _fetchDesaNames() async {
+    final apiService = ApiService();
+    final desaWisataList = await apiService.fetchDesaWisataList();
+    setState(() {
+      desaMap = {for (var item in desaWisataList) item.id: item.nama};
+    });
+  }
+
+  List<DestinasiUlasan> getGroupedReviews() {
+    Map<int, List<ReviewDestinasi>> groupedReviews = {};
+
+    for (var review in reviews) {
+      if (groupedReviews.containsKey(review.idDestinasiwisata)) {
+        groupedReviews[review.idDestinasiwisata]!.add(review);
+      } else {
+        groupedReviews[review.idDestinasiwisata] = [review];
+      }
+    }
+
+    List<DestinasiUlasan> result = [];
+
+    groupedReviews.forEach((idDestinasi, reviewList) {
+      final destination = destinations.firstWhere(
+        (dest) => dest.id == idDestinasi,
+        orElse: () => Destinasi(
+          id: 0,
+          gambar: '',
+          nama: 'Destinasi Tidak Diketahui',
+          deskripsi: '',
+          idKategoridestinasi: 0,
+          idDesawisata: 0,
+        ),
+      );
+
+      double averageRating =
+          reviewList.map((review) => review.rating).reduce((a, b) => a + b) /
+              reviewList.length;
+
+      result.add(
+        DestinasiUlasan(
+          destinasi: destination,
+          averageRating: averageRating,
+          reviewCount: reviewList.length,
+        ),
+      );
+    });
+
+    return result;
+  }
+
+  List<DestinasiUlasan> getFilteredAndSearchedReviews() {
+    List<DestinasiUlasan> groupedReviews = getGroupedReviews();
+
+    // Filter berdasarkan rating bintang
     if (selectedFilter != 'Semua') {
-      int selectedRating = int.parse(selectedFilter.substring(1));
-      filteredDestinations = filteredDestinations
-          .where(
-              (destination) => destination['rating'].floor() == selectedRating)
+      int starFilter = int.parse(selectedFilter.substring(1));
+      groupedReviews = groupedReviews
+          .where((destinasiUlasan) =>
+              destinasiUlasan.averageRating.floor() == starFilter)
           .toList();
     }
 
+    // Filter berdasarkan pencarian
     if (searchQuery.isNotEmpty) {
-      filteredDestinations = filteredDestinations
-          .where((destination) =>
-              destination['name']
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase()) ||
-              destination['location']
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase()))
-          .toList();
+      groupedReviews = groupedReviews.where((destinasiUlasan) {
+        return destinasiUlasan.destinasi.nama
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase()) ||
+            (desaMap[destinasiUlasan.destinasi.idDesawisata]
+                    ?.toLowerCase()
+                    .contains(searchQuery.toLowerCase()) ??
+                false);
+      }).toList();
     }
 
-    return filteredDestinations;
+    return groupedReviews;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ulasan',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Ulasan',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
@@ -130,13 +190,30 @@ class _UlasanPageState extends State<UlasanPage> {
 
             Expanded(
               child: ListView(
-                children: getFilteredDestinations().map((destination) {
-                  return _buildDestinationCard(
-                    destination['image'],
-                    destination['name'],
-                    destination['location'],
-                    destination['rating'],
-                    destination['reviews'],
+                children:
+                    getFilteredAndSearchedReviews().map((destinasiUlasan) {
+                  final destination = destinasiUlasan.destinasi;
+                  final averageRating = destinasiUlasan.averageRating;
+                  final reviewCount = destinasiUlasan.reviewCount;
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailDestinasi(
+                            destinasi: destination,
+                          ),
+                        ),
+                      );
+                    },
+                    child: _buildReviewCard(
+                      destination.gambar,
+                      destination.nama,
+                      desaMap[destination.idDesawisata] ??
+                          'Desa Tidak Diketahui',
+                      averageRating,
+                      reviewCount,
+                    ),
                   );
                 }).toList(),
               ),
@@ -147,8 +224,8 @@ class _UlasanPageState extends State<UlasanPage> {
     );
   }
 
-  Widget _buildDestinationCard(String imageUrl, String name, String location,
-      double rating, int reviews) {
+  Widget _buildReviewCard(String imageUrl, String name, String location,
+      double averageRating, int reviewCount) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -167,11 +244,19 @@ class _UlasanPageState extends State<UlasanPage> {
         child: ListTile(
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              imageUrl,
+            child: Image.network(
+              'http://192.168.43.155:3000/resource/destinasiwisata/${imageUrl}',
               width: 80,
               height: 80,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  'assets/images/default_image.png',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                );
+              },
             ),
           ),
           title: Text(name),
@@ -179,18 +264,32 @@ class _UlasanPageState extends State<UlasanPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(location),
+              const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 16),
+                  const Icon(Icons.star, color: Colors.amber, size: 20),
                   const SizedBox(width: 4),
-                  Text('$rating'),
+                  Text(averageRating.toStringAsFixed(1)),
                 ],
               ),
-              Text('$reviews Reviews'),
+              const SizedBox(height: 4),
+              Text('$reviewCount ulasan'),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+class DestinasiUlasan {
+  final Destinasi destinasi;
+  final double averageRating;
+  final int reviewCount;
+
+  DestinasiUlasan({
+    required this.destinasi,
+    required this.averageRating,
+    required this.reviewCount,
+  });
 }
