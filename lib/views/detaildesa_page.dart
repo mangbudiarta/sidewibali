@@ -132,7 +132,7 @@ class _DetailDesaState extends State<DetailDesa> {
             Stack(
               children: [
                 Image.network(
-                  "http://192.168.43.155:3000/resource/desawisata/${widget.desa.gambar}",
+                  "http://192.168.18.24:3000/resource/desawisata/${widget.desa.gambar}",
                   height: 400,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
@@ -338,7 +338,7 @@ class _DetailDesaState extends State<DetailDesa> {
                       children: destinasiWisata
                           .map((destinasi) => WisataCard(
                                 imageUrl:
-                                    'http://192.168.43.155:3000/resource/destinasiwisata/${destinasi.gambar}',
+                                    'http://192.168.18.24:3000/resource/destinasiwisata/${destinasi.gambar}',
                                 title: destinasi.nama,
                                 destinasi: destinasi,
                               ))
@@ -357,7 +357,7 @@ class _DetailDesaState extends State<DetailDesa> {
                       children: akomodasi
                           .map((akomodasi) => AkomodasiCard(
                                 imageUrl:
-                                    'http://192.168.43.155:3000/resource/akomodasi/${akomodasi.gambar}',
+                                    'http://192.168.18.24:3000/resource/akomodasi/${akomodasi.gambar}',
                                 title: akomodasi.nama,
                                 akomodasi: akomodasi,
                               ))
@@ -376,7 +376,7 @@ class _DetailDesaState extends State<DetailDesa> {
                       children: desaWisataLainnya
                           .map((desa) => DesaCard(
                                 imageUrl:
-                                    'http://192.168.43.155:3000/resource/desawisata/${desa.gambar}',
+                                    'http://192.168.18.24:3000/resource/desawisata/${desa.gambar}',
                                 title: desa.nama,
                                 desa: desa,
                               ))
