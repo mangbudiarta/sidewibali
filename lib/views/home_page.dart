@@ -19,7 +19,7 @@ import 'package:sidewibali/views/notification_page.dart';
 import 'package:sidewibali/views/profile_page.dart';
 import 'package:sidewibali/views/website_page.dart';
 import 'package:sidewibali/widgets/menu_item.dart';
-import 'package:sidewibali/views/detailpaketwisata.dart';
+import 'package:sidewibali/views/detailpaketwisata_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
