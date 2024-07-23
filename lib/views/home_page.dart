@@ -101,23 +101,26 @@ class _HomePageState extends State<HomePage> {
       harga: 100000,
       deskripsi:
           'Paket yang cocok untuk pengalaman wisata yang berkualitas dengan pelayanan terbaik.',
-      id_desawisata: '1',
+      idDesawisata: 1,
       gambar: 'assets/images/produk.png',
+      id: 1,
     ),
     PaketWisata(
       nama: 'Paket Keluarga',
       harga: 50000,
       deskripsi:
           'Paket yang cocok untuk pengalaman wisata yang bersama keluarga dengan harga spesial.',
-      id_desawisata: '2',
+      idDesawisata: 2,
       gambar: 'assets/images/produk.png',
+      id: 2,
     ),
     PaketWisata(
       nama: 'Paket Hari Raya',
       harga: 20000,
       deskripsi: 'Paket yang cocok untuk pengalaman wisata saat hari raya.',
-      id_desawisata: '3',
+      idDesawisata: 3,
       gambar: 'assets/images/produk.png',
+      id: 3,
     ),
   ];
 
@@ -335,8 +338,9 @@ class MainPage extends StatelessWidget {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 10),
                 const Text(
-                  'Paket Wisata',
+                  'Rekomendasi Paket Wisata',
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
@@ -344,7 +348,7 @@ class MainPage extends StatelessWidget {
                 ),
                 SizedBox(height: screenSize.height * 0.01),
                 Column(
-                  children: _homePageState._paketWisataList.map((paket) {
+                  children: homePageState._paketWisataList.map((paket) {
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -352,6 +356,7 @@ class MainPage extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => DetailPaketwisata(
                               paketWisata: paket,
+                              namadesa: '',
                             ),
                           ),
                         );
@@ -386,48 +391,61 @@ class PaketWisataCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.01),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: Image.asset(
-                gambar,
-                width: screenSize.width * 0.3,
-                height: screenSize.height * 0.15,
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(width: screenSize.width * 0.05),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  nama,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: screenSize.height * 0.01),
-                Text(
-                  'Rp ${harga.toString()}',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
             ),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: Image.asset(
+                  gambar,
+                  height: 80,
+                  width: 80,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4.0),
+                    Text(
+                      nama,
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      'Rp ${harga.toString()}',
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        color: Color.fromARGB(255, 0, 194, 204),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
