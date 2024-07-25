@@ -15,7 +15,7 @@ import 'dart:convert';
 import '../models/user_model.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://192.168.43.155:3000';
+  static const String _baseUrl = 'http://192.168.18.24:3000';
 
   // Fungsi untuk melakukan register User
   static Future<bool> registerUser(User user) async {
@@ -395,7 +395,7 @@ class ApiService {
       Uri.parse('$_baseUrl/berita'),
       headers: {'Authorization': 'Bearer $token'},
     );
-
+    print(response.body);
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((item) => Berita.fromJson(item)).toList();

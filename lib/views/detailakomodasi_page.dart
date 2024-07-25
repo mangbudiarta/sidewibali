@@ -36,7 +36,7 @@ class _DetailAkomodasiState extends State<DetailAkomodasi> {
             Stack(
               children: [
                 Image.network(
-                  "http://192.168.43.155:3000/resource/akomodasi/${widget.akomodasi.gambar}",
+                  "http://192.168.18.24:3000/resource/akomodasi/${widget.akomodasi.gambar}",
                   height: 400,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {

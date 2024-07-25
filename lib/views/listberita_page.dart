@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sidewibali/models/berita_model.dart'; 
+import 'package:sidewibali/models/berita_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detailberita_page.dart';
@@ -24,6 +24,7 @@ class _BeritaPageState extends State<BeritaPage> {
   }
 
   Future<void> _loadBerita() async {
+    print(beritaList);
     try {
       final berita = await ApiService.fetchBerita();
       print('Berita Data: $berita');
@@ -124,7 +125,7 @@ class _BeritaPageState extends State<BeritaPage> {
                                 width: double.infinity,
                                 height: 200,
                                 child: Image.network(
-                                  "http://192.168.43.155:3000/resource/berita/${berita.gambar}",
+                                  "http://192.168.18.24:3000/resource/berita/${berita.gambar}",
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Image.asset(

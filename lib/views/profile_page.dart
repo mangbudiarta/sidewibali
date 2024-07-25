@@ -54,7 +54,7 @@ class _ProfilPageState extends State<ProfilPage> {
           _noTelpController.text = userDetails['no_telp'] ?? '';
           _passwordController.text = ''; // Atur password jika diperlukan
           foto = userDetails['foto'] != null
-              ? 'http://192.168.43.155:3000/resource/akun/${userDetails['foto']}'
+              ? 'http://192.168.18.24:3000/resource/akun/${userDetails['foto']}'
               : null;
         });
       }
