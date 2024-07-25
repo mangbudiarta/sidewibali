@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sidewibali/models/berita_model.dart'; 
+import 'package:sidewibali/models/berita_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detailberita_page.dart';
@@ -26,13 +26,11 @@ class _BeritaPageState extends State<BeritaPage> {
   Future<void> _loadBerita() async {
     try {
       final berita = await ApiService.fetchBerita();
-      print('Berita Data: $berita');
       setState(() {
         beritaList = berita;
       });
     } catch (e) {
-      // Handle error
-      print('Failed to load berita: $e');
+      print(e);
     }
   }
 
@@ -86,100 +84,108 @@ class _BeritaPageState extends State<BeritaPage> {
             ),
             const SizedBox(height: 16.0),
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredList.length,
-                itemBuilder: (context, index) {
-                  var berita = filteredList[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailBerita(
-                            berita: berita,
-                          ),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                width: double.infinity,
-                                height: 200,
-                                child: Image.network(
-                                  "http://192.168.43.155:3000/resource/berita/${berita.gambar}",
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      'assets/images/default_image.png',
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
+              child: filteredList.isEmpty
+                  ? Center(
+                      child: Text(
+                      'Belum ada berita yang sesuai',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    ))
+                  : ListView.builder(
+                      itemCount: filteredList.length,
+                      itemBuilder: (context, index) {
+                        var berita = filteredList[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailBerita(
+                                  berita: berita,
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.3),
-                                  borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(20),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 2,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
                                   ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      berita.judul.length > 50
-                                          ? '${berita.judul.substring(0, 50)}...'
-                                          : berita.judul,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold,
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 200,
+                                      child: Image.network(
+                                        "http://192.168.43.155:3000/resource/berita/${berita.gambar}",
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                            'assets/images/default_image.png',
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
                                       ),
                                     ),
-                                    Text(
-                                      DateFormat('dd MMM yyyy')
-                                          .format(berita.createdAt),
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12.0,
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.3),
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(20),
+                                          bottomRight: Radius.circular(20),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            berita.judul.length > 50
+                                                ? '${berita.judul.substring(0, 50)}...'
+                                                : berita.judul,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            DateFormat('dd MMM yyyy')
+                                                .format(berita.createdAt),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12.0,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),

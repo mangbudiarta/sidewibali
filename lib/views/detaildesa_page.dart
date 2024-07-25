@@ -60,7 +60,6 @@ class _DetailDesaState extends State<DetailDesa> {
       return;
     }
 
-    // Fetch current favorites
     final List<int> favorites = await apiService.fetchMyDesaFavorite();
     if (favorites.contains(widget.desa.id)) {
       // Hapus dari favorite
@@ -189,11 +188,13 @@ class _DetailDesaState extends State<DetailDesa> {
                 Image.network(
                   "http://192.168.43.155:3000/resource/desawisata/${widget.desa.gambar}",
                   height: 400,
+                  width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
                       'assets/images/default_image.png',
                       height: 400,
+                      width: double.infinity,
                       fit: BoxFit.cover,
                     );
                   },

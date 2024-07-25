@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/akomodasi_model.dart';
+import 'package:sidewibali/models/assetsdestinasi_model.dart';
 import 'package:sidewibali/models/berita_model.dart';
 import 'package:sidewibali/models/desawisata_model.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
@@ -15,6 +16,7 @@ import 'dart:convert';
 import '../models/user_model.dart';
 
 class ApiService {
+  // api
   static const String _baseUrl = 'http://192.168.43.155:3000';
 
   // Fungsi untuk melakukan register User
@@ -59,7 +61,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan detail akun
+  // Fungsi untuk mendapatkan detail akun dari id akun
   static Future<Map<String, dynamic>> fetchAkunDetail(int userId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -83,7 +85,6 @@ class ApiService {
         throw Exception('Response body is null');
       }
     } else if (response.statusCode == 403 || response.statusCode == 401) {
-      // data dummy jika error 403 atau 401
       return {
         'nama': 'User',
         'foto': 'https://example.com/default-avatar.png',
@@ -116,7 +117,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        return {'success': true, 'data': jsonDecode(response.body)};
       } else {
         throw Exception('Failed to update account');
       }
@@ -138,7 +139,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final responseData = await http.Response.fromStream(response);
-        return jsonDecode(responseData.body);
+        return {'success': true, 'data': jsonDecode(responseData.body)};
       } else {
         final responseData = await http.Response.fromStream(response);
         throw Exception('Failed to update account');
@@ -166,7 +167,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan data informasi desa
+  // Fungsi untuk mendapatkan data informasi desa dari id desa wisata
   Future<InformasiKontak> fetchInformasiKontak(int idDesaWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -185,7 +186,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untek mendapatkan data destinasi wisata berdasarkan id
+  // Fungsi untek mendapatkan data destinasi wisata berdasarkan id desa wisata
   Future<List<Destinasi>> fetchDestinasiWisata(int idDesaWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -225,7 +226,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan detail akomodasi
+  // Fungsi untuk mendapatkan akomodasi desa dari id desawisata
   Future<List<Akomodasi>> fetchAkomodasi(int idDesaWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -285,7 +286,24 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan kategori destinasi
+  // Fungsi untuk mendapatkan semua asset destinasi wisata
+  static Future<List<Assetdestinasi>> fetchAssetsDestinasi() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    final response = await http.get(
+      Uri.parse('$_baseUrl/assetdestinasi'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((item) => Assetdestinasi.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load destinations');
+    }
+  }
+
+  // Fungsi untuk mendapatkan semua kategori destinasi
   Future<List<Kategori>> fetchKategoriDestinasi() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -305,7 +323,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan kategori dengan id kategori
+  // Fungsi untuk mendapatkan nama kategori destinasi dengan id kategori
   Future<String> fetchKategoriDestinasiDetail(int idKategori) async {
     try {
       List<Kategori> kategoriDestinasi = await fetchKategoriDestinasi();
@@ -322,7 +340,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan review dari id destinasi
+  // Fungsi untuk mendapatkan review dengan id destinasi
   Future<List<ReviewDestinasi>> fetchReviewsDestinasi(int destinasiId) async {
     final response = await http
         .get(Uri.parse('$_baseUrl/reviewdestinasi/destinasi/$destinasiId'));
@@ -354,6 +372,7 @@ class ApiService {
     }
   }
 
+  // Fungsi untuk melakukan tambah review destinasi
   Future<void> addReview(ReviewDestinasi review, String token) async {
     final url = Uri.parse('$_baseUrl/reviewdestinasi/add');
     final response = await http.post(
@@ -370,7 +389,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan semua produk
+  // Fungsi untuk mendapatkan semua data produk
   static Future<List<Produk>> fetchProduk() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -387,7 +406,7 @@ class ApiService {
     }
   }
 
-  // Fungsi untuk mendapatkan semua produk
+  // Fungsi untuk mendapatkan semua berita
   static Future<List<Berita>> fetchBerita() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -395,7 +414,6 @@ class ApiService {
       Uri.parse('$_baseUrl/berita'),
       headers: {'Authorization': 'Bearer $token'},
     );
-
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((item) => Berita.fromJson(item)).toList();
@@ -404,6 +422,7 @@ class ApiService {
     }
   }
 
+  // Fungsi untuk mmendaoatkan semua data review destinasi
   static Future<List<ReviewDestinasi>> fetchReviewDestinasi() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -420,7 +439,7 @@ class ApiService {
     }
   }
 
-// Fungsi untek mendapatkan data notifikasi berdasrkan idAkun
+// Fungsi untek mendapatkan data notifikasi berdasrkan id akun
   Future<List<Notifikasi>> fetchNotifikasi() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -441,6 +460,7 @@ class ApiService {
     }
   }
 
+  // Fungsi untuk melakukan update status notifikasi
   Future<bool> updateStatusNotifikasi(int id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -456,6 +476,7 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  // Fungsi untuk melakukan tambah desa favorit
   Future<bool> addDesaFavorite(int idDesaWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -476,6 +497,7 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  // Fungsi untuk melakukan hapus desa favorit
   Future<bool> deleteDesaFavorite(int idFavorit) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -491,6 +513,7 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  // Fungsi untuk mendapatkan desa favorit berdasarkan id akun
   Future<List<int>> fetchMyDesaFavorite() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -511,6 +534,7 @@ class ApiService {
     }
   }
 
+// fungsi untuk mendaptkan semua data desa favorit
   Future<List<int>> fetchAllDesaFavorite() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -531,6 +555,7 @@ class ApiService {
     }
   }
 
+// fungsi untuk id favorit dari id desa wisata
   Future<int> fetchIdByIdDesa(int idDesaWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -546,7 +571,6 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
-      // Mencari objek dengan id_desawisata yang sesuai
       var target =
           data.firstWhere((item) => item['id_desawisata'] == idDesaWisata);
       return target['id'] as int;
@@ -555,6 +579,7 @@ class ApiService {
     }
   }
 
+  // Fungsi untuk menambah destinasi favorit
   Future<bool> addDestinasiFavorite(int idDestinasiWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -575,6 +600,7 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  // Fungsi untuk menghapus destinasi favorit
   Future<bool> deleteDestinasiFavorite(int idFavorit) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -590,6 +616,7 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  // Fungsi untuk mendapatkan destinasi favorit berdasarkan id akun
   Future<List<int>> fetchMyDestinasiFavorite() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -602,7 +629,6 @@ class ApiService {
         'Content-Type': 'application/json',
       },
     );
-
     if (response.statusCode == 200) {
       List data = jsonDecode(response.body);
       return data
@@ -613,6 +639,7 @@ class ApiService {
     }
   }
 
+  // Fungsi untuk mendapatkan semua data destinasi favorit
   Future<List<int>> fetchAllDestinasiFavorite() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -635,6 +662,7 @@ class ApiService {
     }
   }
 
+  // Fungsi untuk mendapatkan id favorit berdasrkan id destinasi wisata
   Future<int> fetchIdByIdDestinasi(int idDestinasiWisata) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -650,7 +678,6 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
-      // Mencari objek dengan id_desawisata yang sesuai
       var target = data.firstWhere(
           (item) => item['id_destinasiwisata'] == idDestinasiWisata);
       return target['id'] as int;

@@ -48,6 +48,7 @@ class _DetailPaketwisataState extends State<DetailPaketwisata> {
                     return Image.asset(
                       'assets/images/default_image.png',
                       height: 400,
+                      width: double.infinity,
                       fit: BoxFit.cover,
                     );
                   },

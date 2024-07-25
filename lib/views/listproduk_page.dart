@@ -93,26 +93,34 @@ class _ProdukPageState extends State<ProdukPage> {
                   ),
                   const SizedBox(height: 16.0),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredProduk.length,
-                      itemBuilder: (context, index) {
-                        var produk = filteredProduk[index];
-                        return CardProduk(
-                          produk: produk,
-                          desaMap: desaMap,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailProduk(
-                                    produk: produk,
-                                    namadesa: desaMap[produk.idDesawisata]),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    child: filteredProduk.isEmpty
+                        ? Center(
+                            child: Text(
+                            'Belum ada produk yang sesuai',
+                            style: TextStyle(
+                                fontSize: 16, color: Colors.grey[600]),
+                          ))
+                        : ListView.builder(
+                            itemCount: filteredProduk.length,
+                            itemBuilder: (context, index) {
+                              var produk = filteredProduk[index];
+                              return CardProduk(
+                                produk: produk,
+                                desaMap: desaMap,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailProduk(
+                                          produk: produk,
+                                          namadesa:
+                                              desaMap[produk.idDesawisata]),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),

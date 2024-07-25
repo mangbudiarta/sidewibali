@@ -22,7 +22,7 @@ class ReviewDestinasi {
       idDestinasiwisata: json['id_destinasiwisata'],
       rating: json['rating'],
       review: json['review'],
-      setujui: json['setujui'] == 0, // Ubah menjadi bool jika perlu
+      setujui: json['setujui'] == 0,
     );
   }
 

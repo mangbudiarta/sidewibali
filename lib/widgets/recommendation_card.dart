@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class RecommendationCard extends StatelessWidget {
   final String gambar;
   final String nama;
-  final String id_desawisata;
+  final String namadesa;
 
   const RecommendationCard({
     super.key,
     required this.gambar,
     required this.nama,
-    required this.id_desawisata,
+    required this.namadesa,
   });
 
   @override
@@ -35,11 +35,19 @@ class RecommendationCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
-                child: Image.asset(
-                  gambar,
-                  height: 80,
+                child: Image.network(
+                  "http://192.168.43.155:3000/resource/destinasiwisata/${gambar}",
                   width: 80,
+                  height: 80,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/default_image.png',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 12.0),
@@ -61,7 +69,7 @@ class RecommendationCard extends StatelessWidget {
                         const Icon(Icons.location_on,
                             size: 16.0, color: Colors.grey),
                         const SizedBox(width: 4.0),
-                        Text(id_desawisata,
+                        Text(namadesa,
                             style: const TextStyle(color: Colors.grey)),
                       ],
                     ),
