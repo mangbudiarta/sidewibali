@@ -52,7 +52,7 @@ class _ProfilPageState extends State<ProfilPage> {
           _namaLengkapController.text = userDetails['nama'] ?? '';
           _emailController.text = userDetails['email'] ?? '';
           _noTelpController.text = userDetails['no_telp'] ?? '';
-          _passwordController.text = ''; // Atur password jika diperlukan
+          _passwordController.text = '';
           foto = userDetails['foto'] != null
               ? 'http://192.168.43.155:3000/resource/akun/${userDetails['foto']}'
               : null;
@@ -314,7 +314,6 @@ class _ProfilPageState extends State<ProfilPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? userId = prefs.getInt('userId');
       if (userId != null) {
-        // Buat map untuk data yang akan dikirim
         Map<String, dynamic> data = {
           'id': userId,
           'nama': _namaLengkapController.text,

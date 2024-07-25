@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sidewibali/models/informasi_model.dart';
-import 'package:sidewibali/models/paketwisata_model.dart';
 import 'package:sidewibali/models/produk_model.dart';
 import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/widgets/informasi_kontak.dart';
@@ -49,6 +48,7 @@ class _DetailProdukState extends State<DetailProduk> {
                     return Image.asset(
                       'assets/images/default_image.png',
                       height: 400,
+                      width: double.infinity,
                       fit: BoxFit.cover,
                     );
                   },

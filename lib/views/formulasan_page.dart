@@ -65,14 +65,13 @@ class _FormUlasanState extends State<FormUlasan> {
       return;
     }
 
-    // Logic to submit review
     final review = ReviewDestinasi(
-      id: 0, // ID will be assigned by the server
+      id: 0,
       idAkun: _idAkun,
       idDestinasiwisata: widget.destinasi.id,
       rating: _rating,
       review: reviewText,
-      setujui: false, // Initial approval status
+      setujui: false,
     );
 
     try {

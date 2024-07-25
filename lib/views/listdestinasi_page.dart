@@ -130,12 +130,19 @@ class _DestinasiPageState extends State<DestinasiPage> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredDestinations.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return _buildDestinationCard(filteredDestinations[index]);
-                },
-              ),
+              child: filteredDestinations.isEmpty
+                  ? Center(
+                      child: Text(
+                      'Belum ada destinasi yang sesuai',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    ))
+                  : ListView.builder(
+                      itemCount: filteredDestinations.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return _buildDestinationCard(
+                            filteredDestinations[index]);
+                      },
+                    ),
             ),
           ],
         ),

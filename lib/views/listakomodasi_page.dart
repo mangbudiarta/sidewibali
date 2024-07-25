@@ -13,7 +13,6 @@ class AkomodasiPage extends StatefulWidget {
 class _AkomodasiPageState extends State<AkomodasiPage> {
   String selectedCategory = 'Semua';
   String searchQuery = '';
-
   List<String> categories = ['Semua'];
   List<Akomodasi> accommodations = [];
 
@@ -119,27 +118,19 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
               ),
             ),
             Expanded(
-              child: FutureBuilder<List<Akomodasi>>(
-                future: ApiService().fetchAkomodasiList(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Failed to load data'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No data available'));
-                  } else {
-                    accommodations = snapshot.data!;
-                    return ListView.builder(
+              child: filteredAccommodations.isEmpty
+                  ? Center(
+                      child: Text(
+                      'Belum ada akomodasi yang sesuai',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    ))
+                  : ListView.builder(
                       itemCount: filteredAccommodations.length,
                       itemBuilder: (BuildContext context, int index) {
                         return _buildAccommodationCard(
                             filteredAccommodations[index]);
                       },
-                    );
-                  }
-                },
-              ),
+                    ),
             ),
           ],
         ),

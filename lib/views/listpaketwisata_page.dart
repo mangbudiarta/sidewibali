@@ -29,7 +29,7 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
         this.paketwisata = paketwisata;
       });
     } catch (e) {
-      print('Error fetching Paket Wisata: $e');
+      print(e);
     }
   }
 
@@ -40,7 +40,7 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
         desaMap = {for (var item in desaWisataList) item.id: item.nama};
       });
     } catch (e) {
-      print('Error fetching Desa Names: $e');
+      print(e);
     }
   }
 
@@ -93,27 +93,34 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
                   ),
                   const SizedBox(height: 16.0),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredPaketWisata.length,
-                      itemBuilder: (context, index) {
-                        var paketWisata = filteredPaketWisata[index];
-                        return CardPaketWisata(
-                          paketWisata: paketWisata,
-                          desaMap: desaMap,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailPaketwisata(
-                                    paketWisata: paketWisata,
-                                    namadesa:
-                                        desaMap[paketWisata.idDesawisata]),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    child: filteredPaketWisata.isEmpty
+                        ? Center(
+                            child: Text(
+                            'Belum ada paket wisata yang sesuai',
+                            style: TextStyle(
+                                fontSize: 16, color: Colors.grey[600]),
+                          ))
+                        : ListView.builder(
+                            itemCount: filteredPaketWisata.length,
+                            itemBuilder: (context, index) {
+                              var paketWisata = filteredPaketWisata[index];
+                              return CardPaketWisata(
+                                paketWisata: paketWisata,
+                                desaMap: desaMap,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailPaketwisata(
+                                          paketWisata: paketWisata,
+                                          namadesa: desaMap[
+                                              paketWisata.idDesawisata]),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),
