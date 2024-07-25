@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
-import 'package:sidewibali/models/paketwisata_model.dart';
+import 'package:sidewibali/services/api_service.dart';
 import 'package:sidewibali/utils/colors.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
 import 'package:sidewibali/views/listdesa_page.dart';
@@ -19,7 +19,6 @@ import 'package:sidewibali/views/notification_page.dart';
 import 'package:sidewibali/views/profile_page.dart';
 import 'package:sidewibali/views/website_page.dart';
 import 'package:sidewibali/widgets/menu_item.dart';
-import 'package:sidewibali/views/detailpaketwisata_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,109 +27,17 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-// class PaketWisata {
-//   final String gambar;
-//   final String nama;
-//   final int harga;
-
-//   PaketWisata({
-//     required this.gambar,
-//     required this.nama,
-//     required this.harga,
-//   });
-// }
-
 class _HomePageState extends State<HomePage> {
   bool isLoggedIn = false;
   int _selectedIndex = 0;
   List<Destinasi> _recommendedPlaces = [];
-  List<PaketWisata> _paketWisataList = [];
-  List<String> _carouselImages = [];
-
-  Map<int, String> kategoriMap = {
-    1: 'Budaya',
-    2: 'Alam',
-    3: 'Religi',
-  };
-
-  Map<int, String> desaMap = {
-    1: 'Desa Candikuning',
-    2: 'Desa Ubud',
-    3: 'Desa Kuta',
-  };
-
-  List<String> dummyCarouselImages = [
-    'assets/images/beratan.png',
-    'assets/images/kuta.png',
-    'assets/images/ubud.png',
-    'assets/images/kuta.png',
-  ];
-
-  List<Destinasi> dummyRecommendedPlaces = [
-    Destinasi(
-      id: 1,
-      gambar: 'assets/images/beratan.png',
-      nama: 'Danau Beratan',
-      deskripsi:
-          'Danau beratan merupakan sebuah destinasi yang ada di desa candikuning. Destinasi ini sering dikunjungi wisatawan',
-      idKategoridestinasi: 3,
-      idDesawisata: 1,
-    ),
-    Destinasi(
-      id: 2,
-      gambar: 'assets/images/ubud.png',
-      nama: 'Puri Ubud',
-      deskripsi:
-          'Puri Ubud merupakan sebuah tempat yang terkenal di Ubud hingga dunia. Puri Ubud merupakan tempat tinggal dari Raja Ubud',
-      idKategoridestinasi: 1,
-      idDesawisata: 2,
-    ),
-    Destinasi(
-      id: 3,
-      gambar: 'assets/images/kuta.png',
-      nama: 'Kuta',
-      deskripsi: 'Pantai terkenal dengan ombak dan kehidupan malamnya.',
-      idKategoridestinasi: 2,
-      idDesawisata: 3,
-    ),
-  ];
-
-  List<PaketWisata> dummyPaketWisataList = [
-    PaketWisata(
-      nama: 'Paket Premium',
-      harga: 100000,
-      deskripsi:
-          'Paket yang cocok untuk pengalaman wisata yang berkualitas dengan pelayanan terbaik.',
-      idDesawisata: 1,
-      gambar: 'assets/images/produk.png',
-      id: 1,
-    ),
-    PaketWisata(
-      nama: 'Paket Keluarga',
-      harga: 50000,
-      deskripsi:
-          'Paket yang cocok untuk pengalaman wisata yang bersama keluarga dengan harga spesial.',
-      idDesawisata: 2,
-      gambar: 'assets/images/produk.png',
-      id: 2,
-    ),
-    PaketWisata(
-      nama: 'Paket Hari Raya',
-      harga: 20000,
-      deskripsi: 'Paket yang cocok untuk pengalaman wisata saat hari raya.',
-      idDesawisata: 3,
-      gambar: 'assets/images/produk.png',
-      id: 3,
-    ),
-  ];
+  List<Map<String, dynamic>> _recommendedPlacesWithNames = [];
 
   @override
   void initState() {
     super.initState();
-    _carouselImages = dummyCarouselImages;
-    _recommendedPlaces = dummyRecommendedPlaces;
-    _paketWisataList = dummyPaketWisataList;
     _checkLoginStatus();
+    _fetchRecommendedDestinations();
   }
 
   Future<void> _checkLoginStatus() async {
@@ -139,19 +46,35 @@ class _HomePageState extends State<HomePage> {
     int? userId = preferences.getInt('userId');
 
     setState(() {
-      if (token != null && userId != null) {
-        isLoggedIn = true;
-      } else {
-        isLoggedIn = false;
-      }
+      isLoggedIn = token != null && userId != null;
     });
+  }
+
+  Future<void> _fetchRecommendedDestinations() async {
+    try {
+      List<Destinasi> allDestinations = await ApiService.fetchDestinasi();
+      List<Map<String, dynamic>> placesWithNames = [];
+      for (var destinasi in allDestinations.take(4)) {
+        String namaDesa =
+            await ApiService().fetchNamaDesa(destinasi.idDesawisata);
+        placesWithNames.add({
+          'destinasi': destinasi,
+          'namaDesa': namaDesa,
+        });
+      }
+      setState(() {
+        _recommendedPlacesWithNames = placesWithNames;
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   List<Widget> _widgetOptions() {
     if (isLoggedIn) {
       return <Widget>[
         const MainPage(),
-        const FavoritePage(),
+        FavoritePage(),
         const NotificationPage(),
         ProfilPage(),
       ];
@@ -228,13 +151,54 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   const MainPage({super.key});
+
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  List<Map<String, dynamic>> _recommendedPlacesWithNames = [];
+  List<String> _carouselImages = [];
+
+  List<String> dummyCarouselImages = [
+    'assets/images/beratan.png',
+    'assets/images/kuta.png',
+    'assets/images/ubud.png',
+    'assets/images/kuta.png',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecommendedDestinations();
+    _carouselImages = dummyCarouselImages;
+  }
+
+  Future<void> _fetchRecommendedDestinations() async {
+    try {
+      List<Destinasi> allDestinations = await ApiService.fetchDestinasi();
+      List<Map<String, dynamic>> placesWithNames = [];
+      for (var destinasi in allDestinations.take(4)) {
+        String namaDesa =
+            await ApiService().fetchNamaDesa(destinasi.idDesawisata);
+        placesWithNames.add({
+          'destinasi': destinasi,
+          'namaDesa': namaDesa,
+        });
+      }
+      setState(() {
+        _recommendedPlacesWithNames = placesWithNames;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
-    final homePageState = context.findAncestorStateOfType<_HomePageState>();
 
     return SingleChildScrollView(
       child: Column(
@@ -252,7 +216,7 @@ class MainPage extends StatelessWidget {
                 aspectRatio: 16 / 9,
                 enlargeCenterPage: true,
               ),
-              items: homePageState!._carouselImages.map((i) {
+              items: _carouselImages.map((i) {
                 return Builder(
                   builder: (BuildContext context) {
                     return Container(
@@ -316,55 +280,23 @@ class MainPage extends StatelessWidget {
                 ),
                 SizedBox(height: screenSize.height * 0.01),
                 Column(
-                  children: homePageState._recommendedPlaces.map((place) {
+                  children: _recommendedPlacesWithNames.map((place) {
+                    final destinasi = place['destinasi'] as Destinasi;
+                    final namaDesa = place['namaDesa'] as String;
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DetailDestinasi(
-                              destinasi: place,
-                            ),
+                            builder: (context) =>
+                                DetailDestinasi(destinasi: destinasi),
                           ),
                         );
                       },
                       child: RecommendationCard(
-                        gambar: place.gambar,
-                        nama: place.nama,
-                        id_desawisata:
-                            homePageState.desaMap[place.idDesawisata] ??
-                                'Unknown',
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Rekomendasi Paket Wisata',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: screenSize.height * 0.01),
-                Column(
-                  children: homePageState._paketWisataList.map((paket) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailPaketwisata(
-                              paketWisata: paket,
-                              namadesa: '',
-                            ),
-                          ),
-                        );
-                      },
-                      child: PaketWisataCard(
-                        gambar: paket.gambar,
-                        nama: paket.nama,
-                        harga: paket.harga,
+                        gambar: destinasi.gambar,
+                        nama: destinasi.nama,
+                        namadesa: namaDesa,
                       ),
                     );
                   }).toList(),
@@ -373,80 +305,6 @@ class MainPage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class PaketWisataCard extends StatelessWidget {
-  final String gambar;
-  final String nama;
-  final int harga;
-
-  const PaketWisataCard({
-    required this.gambar,
-    required this.nama,
-    required this.harga,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Image.asset(
-                  gambar,
-                  height: 80,
-                  width: 80,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(width: 12.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 4.0),
-                    Text(
-                      nama,
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      'Rp ${harga.toString()}',
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        color: Color.fromARGB(255, 0, 194, 204),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

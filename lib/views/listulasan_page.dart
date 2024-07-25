@@ -189,34 +189,41 @@ class _UlasanPageState extends State<UlasanPage> {
             const SizedBox(height: 16.0),
 
             Expanded(
-              child: ListView(
-                children:
-                    getFilteredAndSearchedReviews().map((destinasiUlasan) {
-                  final destination = destinasiUlasan.destinasi;
-                  final averageRating = destinasiUlasan.averageRating;
-                  final reviewCount = destinasiUlasan.reviewCount;
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailDestinasi(
-                            destinasi: destination,
+              child: getFilteredAndSearchedReviews().isEmpty
+                  ? Center(
+                      child: Text(
+                        'Belum ada ulasan yang sesuai',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      ),
+                    )
+                  : ListView(
+                      children: getFilteredAndSearchedReviews()
+                          .map((destinasiUlasan) {
+                        final destination = destinasiUlasan.destinasi;
+                        final averageRating = destinasiUlasan.averageRating;
+                        final reviewCount = destinasiUlasan.reviewCount;
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailDestinasi(
+                                  destinasi: destination,
+                                ),
+                              ),
+                            );
+                          },
+                          child: _buildReviewCard(
+                            destination.gambar,
+                            destination.nama,
+                            desaMap[destination.idDesawisata] ??
+                                'Desa Tidak Diketahui',
+                            averageRating,
+                            reviewCount,
                           ),
-                        ),
-                      );
-                    },
-                    child: _buildReviewCard(
-                      destination.gambar,
-                      destination.nama,
-                      desaMap[destination.idDesawisata] ??
-                          'Desa Tidak Diketahui',
-                      averageRating,
-                      reviewCount,
+                        );
+                      }).toList(),
                     ),
-                  );
-                }).toList(),
-              ),
             ),
           ],
         ),

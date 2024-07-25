@@ -170,6 +170,15 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                   } else {
                     List<DesaWisata> filteredDesaList =
                         getFilteredDesaWisata(snapshot.data ?? []);
+                    if (filteredDesaList.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'Belum ada desa wisata yang sesuai',
+                          style:
+                              TextStyle(fontSize: 16, color: Colors.grey[600]),
+                        ),
+                      );
+                    }
                     return ListView.builder(
                       itemCount: filteredDesaList.length,
                       itemBuilder: (context, index) {

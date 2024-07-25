@@ -3,16 +3,16 @@ import 'package:sidewibali/utils/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WebsitePage extends StatelessWidget {
-  final String url =
-      "https://www.google.com";
+  // url website
+  final String url = "https://bali.jadesta.com/";
 
-  const WebsitePage({super.key}); // Ganti dengan URL yang diinginkan
+  const WebsitePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Website'), // Sesuaikan dengan tema warna aplikasi
+        title: const Text('Website'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -21,7 +21,7 @@ class WebsitePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Image.asset(
-              'assets/images/logo_text_max.png', // Ganti dengan path logo Sidewi Bali
+              'assets/images/logo_text_max.png',
               height: 150,
               width: 150,
             ),
@@ -32,7 +32,7 @@ class WebsitePage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: primary, // Sesuaikan dengan tema warna aplikasi
+                color: primary,
               ),
             ),
             const SizedBox(height: 10),
@@ -55,8 +55,7 @@ class WebsitePage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: const Color.fromARGB(
-                    255, 0, 194, 204), // Sesuaikan dengan tema warna aplikasi
+                backgroundColor: const Color.fromARGB(255, 0, 194, 204),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),

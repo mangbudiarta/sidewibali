@@ -47,7 +47,9 @@ class _NotificationPageState extends State<NotificationPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Tidak ada notifikasi'));
+            return Center(
+                child: Text('Tidak ada notifikasi',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600])));
           } else {
             final notifikasiList = snapshot.data!;
             notifikasiList.sort((a, b) => b.createdAt.compareTo(a.createdAt));

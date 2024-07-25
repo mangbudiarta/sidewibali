@@ -27,13 +27,6 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
   String categoryName = '';
   late Future<List<ReviewDestinasi>> futureReview;
 
-  void _toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-      likeCount += isLiked ? 1 : -1;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -55,7 +48,6 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
       return;
     }
 
-    // Fetch current favorites
     final List<int> favorites = await apiService.fetchMyDestinasiFavorite();
     if (favorites.contains(widget.destinasi.id)) {
       // Hapus dari favorite
@@ -149,11 +141,13 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                 Image.network(
                   widget.destinasi.gambar,
                   height: 400,
+                  width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
                       'assets/images/default_image.png',
                       height: 400,
+                      width: double.infinity,
                       fit: BoxFit.cover,
                     );
                   },
