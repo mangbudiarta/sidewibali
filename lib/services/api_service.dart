@@ -375,17 +375,21 @@ class ApiService {
   // Fungsi untuk melakukan tambah review destinasi
   Future<void> addReview(ReviewDestinasi review, String token) async {
     final url = Uri.parse('$_baseUrl/reviewdestinasi/add');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode(review.toJson()),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(review.toJson()),
+      );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to add review');
+      if (response.statusCode != 200) {
+        throw Exception('Failed to add review');
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
