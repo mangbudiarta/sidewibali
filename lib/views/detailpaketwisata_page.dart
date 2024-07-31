@@ -40,7 +40,7 @@ class _DetailPaketwisataState extends State<DetailPaketwisata> {
             Stack(
               children: [
                 Image.network(
-                  "http://192.168.43.155:3000/resource/paketwisata/${widget.paketWisata.gambar}",
+                  "http://8.215.11.162:3000/resource/paketwisata/${widget.paketWisata.gambar}",
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 400,

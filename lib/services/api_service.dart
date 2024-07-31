@@ -17,7 +17,7 @@ import '../models/user_model.dart';
 
 class ApiService {
   // api
-  static const String _baseUrl = 'http://192.168.43.155:3000';
+  static const String _baseUrl = 'http://8.215.11.162:3000';
 
   // Fungsi untuk melakukan register User
   static Future<bool> registerUser(User user) async {
@@ -101,49 +101,54 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
-    if (!data.containsKey('foto') || data['foto'] == null || kIsWeb) {
-      final response = await http.patch(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'nama': data['nama'],
-          'email': data['email'],
-          'no_telp': data['no_telp'],
-          'password': data['password'] ?? '',
-        }),
-      );
+    try {
+      if (!data.containsKey('foto') || data['foto'] == null || kIsWeb) {
+        final response = await http.patch(
+          url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'nama': data['nama'],
+            'email': data['email'],
+            'no_telp': data['no_telp'],
+            'password': data['password'] ?? '',
+          }),
+        );
 
-      if (response.statusCode == 200) {
-        return {'success': true, 'data': jsonDecode(response.body)};
+        if (response.statusCode == 200) {
+          return {'success': true, 'data': jsonDecode(response.body)};
+        } else {
+          throw Exception('Failed to update account');
+        }
       } else {
-        throw Exception('Failed to update account');
+        var request = http.MultipartRequest('PATCH', url)
+          ..headers['Authorization'] = 'Bearer $token'
+          ..fields['nama'] = data['nama']
+          ..fields['email'] = data['email']
+          ..fields['no_telp'] = data['no_telp'];
+
+        if (data['password'] != null && data['password'].isNotEmpty) {
+          request.fields['password'] = data['password'];
+        }
+
+        request.files
+            .add(await http.MultipartFile.fromPath('foto', data['foto']));
+
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          final responseData = await http.Response.fromStream(response);
+          return {'success': true, 'data': jsonDecode(responseData.body)};
+        } else {
+          final responseData = await http.Response.fromStream(response);
+          throw Exception('Failed to update account');
+        }
       }
-    } else {
-      var request = http.MultipartRequest('PATCH', url)
-        ..headers['Authorization'] = 'Bearer $token'
-        ..fields['nama'] = data['nama']
-        ..fields['email'] = data['email']
-        ..fields['no_telp'] = data['no_telp'];
-
-      if (data['password'] != null && data['password'].isNotEmpty) {
-        request.fields['password'] = data['password'];
-      }
-
-      request.files
-          .add(await http.MultipartFile.fromPath('foto', data['foto']));
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        final responseData = await http.Response.fromStream(response);
-        return {'success': true, 'data': jsonDecode(responseData.body)};
-      } else {
-        final responseData = await http.Response.fromStream(response);
-        throw Exception('Failed to update account');
-      }
+    } catch (e) {
+      debugPrint('Error in updateAkun: $e');
+      throw Exception('An error occurred: $e');
     }
   }
 

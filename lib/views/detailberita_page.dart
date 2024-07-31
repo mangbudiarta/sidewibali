@@ -25,7 +25,7 @@ class DetailBerita extends StatelessWidget {
             Stack(
               children: [
                 Image.network(
-                  "http://192.168.43.155:3000/resource/berita/${berita.gambar}",
+                  "http://8.215.11.162:3000/resource/berita/${berita.gambar}",
                   height: 400,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {

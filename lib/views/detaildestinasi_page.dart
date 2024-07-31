@@ -139,7 +139,7 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
             Stack(
               children: [
                 Image.network(
-                  widget.destinasi.gambar,
+                  'http://8.215.11.162:3000/resource/destinasiwisata/${widget.destinasi.gambar}',
                   height: 400,
                   width: double.infinity,
                   fit: BoxFit.cover,

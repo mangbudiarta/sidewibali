@@ -37,6 +37,11 @@ class _FormUlasanState extends State<FormUlasan> {
         context,
         MaterialPageRoute(builder: (context) => LoginView()),
       );
+    } else {
+      setState(() {
+        _token = token;
+        _idAkun = id;
+      });
     }
   }
 

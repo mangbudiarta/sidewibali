@@ -169,7 +169,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                "http://192.168.43.155:3000/resource/akomodasi/${accommodation.gambar}",
+                "http://8.215.11.162:3000/resource/akomodasi/${accommodation.gambar}",
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
