@@ -56,7 +56,10 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
       appBar: AppBar(
         title: const Text(
           'Paket Wisata',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: "nunitoBold"),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -89,6 +92,7 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       ),
+                      style: const TextStyle(fontFamily: 'nunitoRegular'),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -98,27 +102,22 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
                             child: Text(
                             'Belum ada paket wisata yang sesuai',
                             style: TextStyle(
-                                fontSize: 16, color: Colors.grey[600]),
+                                fontFamily: 'nunitoRegular',
+                                fontSize: 16,
+                                color: Colors.grey[600]),
                           ))
-                        : ListView.builder(
+                        : GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, // Two columns
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
+                              childAspectRatio: 3 / 4, // Adjust as needed
+                            ),
                             itemCount: filteredPaketWisata.length,
-                            itemBuilder: (context, index) {
-                              var paketWisata = filteredPaketWisata[index];
-                              return CardPaketWisata(
-                                paketWisata: paketWisata,
-                                desaMap: desaMap,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DetailPaketwisata(
-                                          paketWisata: paketWisata,
-                                          namadesa: desaMap[
-                                              paketWisata.idDesawisata]),
-                                    ),
-                                  );
-                                },
-                              );
+                            itemBuilder: (BuildContext context, int index) {
+                              return _buildPaketWisataCard(
+                                  filteredPaketWisata[index]);
                             },
                           ),
                   ),
@@ -127,64 +126,87 @@ class _PaketWisataPageState extends State<PaketWisataPage> {
       ),
     );
   }
-}
 
-class CardPaketWisata extends StatelessWidget {
-  final PaketWisata paketWisata;
-  final VoidCallback onTap;
-  final Map<int, String> desaMap;
-
-  const CardPaketWisata({
-    super.key,
-    required this.paketWisata,
-    required this.onTap,
-    required this.desaMap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
+  Widget _buildPaketWisataCard(PaketWisata paketWisata) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPaketwisata(
+              paketWisata: paketWisata,
+              namadesa:
+                  desaMap[paketWisata.idDesawisata] ?? 'Desa Tidak Diketahui',
+            ),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    "http://8.215.11.162:3000/resource/paketwisata/${paketWisata.gambar}",
+                    height: 100,
+                    width: 165,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/default_image.png',
+                        height: 100,
+                        width: 165,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                paketWisata.nama,
+                style: const TextStyle(
+                  fontFamily: "nunitoSemiBold",
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    size: 14,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    desaMap[paketWisata.idDesawisata] ?? 'Desa Tidak Diketahui',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontFamily: 'nunitoRegular',
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                "http://192.168.43.155:3000/resource/paketwisata/${paketWisata.gambar}",
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/default_image.png',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            ),
-            title: Text(paketWisata.nama),
-            subtitle: Row(
-              children: [
-                Text(desaMap[paketWisata.idDesawisata] ??
-                    'Desa Tidak Diketahui'),
-              ],
-            ),
           ),
         ),
       ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sidewibali/models/destinasi_model.dart';
 import 'package:sidewibali/models/ulasan_model.dart';
 import 'package:sidewibali/services/api_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/views/detaildestinasi_page.dart';
 
 class UlasanPage extends StatefulWidget {
@@ -124,9 +123,12 @@ class _UlasanPageState extends State<UlasanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Ulasan',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontFamily: 'NunitoBold',
+            fontSize: 24,
+          ),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -150,12 +152,15 @@ class _UlasanPageState extends State<UlasanPage> {
                     searchQuery = value;
                   });
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Cari',
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                ),
+                style: TextStyle(
+                  fontFamily: 'NunitoRegular',
                 ),
               ),
             ),
@@ -168,8 +173,10 @@ class _UlasanPageState extends State<UlasanPage> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: ChoiceChip(
-                      label: Text(filter),
-                      labelStyle: const TextStyle(color: Colors.black),
+                      label: Text(
+                        filter,
+                        style: TextStyle(fontFamily: 'NunitoRegular'),
+                      ),
                       backgroundColor: Colors.grey[200],
                       selectedColor: const Color.fromARGB(255, 172, 241, 244),
                       selected: selectedFilter == filter,
@@ -187,18 +194,29 @@ class _UlasanPageState extends State<UlasanPage> {
               ),
             ),
             const SizedBox(height: 16.0),
-
             Expanded(
               child: getFilteredAndSearchedReviews().isEmpty
                   ? Center(
                       child: Text(
                         'Belum ada ulasan yang sesuai',
-                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontFamily: 'NunitoRegular',
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
                       ),
                     )
-                  : ListView(
-                      children: getFilteredAndSearchedReviews()
-                          .map((destinasiUlasan) {
+                  : GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Jumlah kolom grid
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                        childAspectRatio: 3 / 4,
+                      ),
+                      itemCount: getFilteredAndSearchedReviews().length,
+                      itemBuilder: (context, index) {
+                        final destinasiUlasan =
+                            getFilteredAndSearchedReviews()[index];
                         final destination = destinasiUlasan.destinasi;
                         final averageRating = destinasiUlasan.averageRating;
                         final reviewCount = destinasiUlasan.reviewCount;
@@ -222,7 +240,7 @@ class _UlasanPageState extends State<UlasanPage> {
                             reviewCount,
                           ),
                         );
-                      }).toList(),
+                      },
                     ),
             ),
           ],
@@ -233,57 +251,78 @@ class _UlasanPageState extends State<UlasanPage> {
 
   Widget _buildReviewCard(String imageUrl, String name, String location,
       double averageRating, int reviewCount) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: ListTile(
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             child: Image.network(
-              'http://192.168.43.155:3000/resource/destinasiwisata/${imageUrl}',
-              width: 80,
-              height: 80,
+              'http://8.215.11.162:3000/resource/destinasiwisata/${imageUrl}',
+              width: 165,
+              height: 100,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Image.asset(
                   'assets/images/default_image.png',
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   fit: BoxFit.cover,
                 );
               },
             ),
           ),
-          title: Text(name),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(location),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 20),
-                  const SizedBox(width: 4),
-                  Text(averageRating.toStringAsFixed(1)),
-                ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              name,
+              style: TextStyle(
+                fontFamily: 'NunitoBold',
+                fontSize: 16,
               ),
-              const SizedBox(height: 4),
-              Text('$reviewCount ulasan'),
-            ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              location,
+              style: TextStyle(
+                fontFamily: 'NunitoRegular',
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                  size: 20,
+                ),
+                Text(
+                  ' ${averageRating.toStringAsFixed(1)} (${reviewCount} ulasan)',
+                  style: TextStyle(
+                    fontFamily: 'NunitoRegular',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

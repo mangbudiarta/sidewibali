@@ -36,8 +36,6 @@ class _BeritaPageState extends State<BeritaPage> {
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-
     var filteredList = beritaList
         .where((berita) =>
             berita.judul.toLowerCase().contains(searchQuery.toLowerCase()))
@@ -49,7 +47,11 @@ class _BeritaPageState extends State<BeritaPage> {
       appBar: AppBar(
         title: const Text(
           'Berita',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'NunitoBold',
+          ),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -73,8 +75,14 @@ class _BeritaPageState extends State<BeritaPage> {
                     searchQuery = value;
                   });
                 },
+                style: const TextStyle(
+                  fontFamily: 'NunitoRegular',
+                ),
                 decoration: const InputDecoration(
                   hintText: 'Cari Berita',
+                  hintStyle: TextStyle(
+                    fontFamily: 'NunitoRegular',
+                  ),
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                   contentPadding:
@@ -88,9 +96,20 @@ class _BeritaPageState extends State<BeritaPage> {
                   ? Center(
                       child: Text(
                       'Belum ada berita yang sesuai',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontFamily: 'NunitoRegular',
+                      ),
                     ))
-                  : ListView.builder(
+                  : GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Dua kolom
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                        childAspectRatio: 3 / 4, // Menyesuaikan proporsi card
+                      ),
                       itemCount: filteredList.length,
                       itemBuilder: (context, index) {
                         var berita = filteredList[index];
@@ -105,87 +124,74 @@ class _BeritaPageState extends State<BeritaPage> {
                               ),
                             );
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 2,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 200,
-                                      child: Image.network(
-                                        "http://192.168.43.155:3000/resource/berita/${berita.gambar}",
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Image.asset(
-                                            'assets/images/default_image.png',
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.3),
-                                        borderRadius: const BorderRadius.only(
-                                          bottomLeft: Radius.circular(20),
-                                          bottomRight: Radius.circular(20),
-                                        ),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            berita.judul.length > 50
-                                                ? '${berita.judul.substring(0, 50)}...'
-                                                : berita.judul,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            DateFormat('dd MMM yyyy')
-                                                .format(berita.createdAt),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12.0,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          child: _buildBeritaCard(berita),
                         );
                       },
                     ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBeritaCard(Berita berita) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  "http://8.215.11.162:3000/resource/berita/${berita.gambar}",
+                  height: 100,
+                  width: 165,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/default_image.png',
+                      height: 100,
+                      width: 100,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              berita.judul.length > 50
+                  ? '${berita.judul.substring(0, 50)}...'
+                  : berita.judul,
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'NunitoSemiBold',
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              dateFormat.format(berita.createdAt),
+              style: const TextStyle(
+                fontSize: 14.0,
+                color: Colors.grey,
+                fontFamily: 'NunitoRegular',
+              ),
             ),
           ],
         ),

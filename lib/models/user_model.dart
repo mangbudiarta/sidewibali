@@ -21,7 +21,7 @@ class User {
       'email': email,
       'password': password,
       'no_telp': noTelp,
-      'foto': foto,
+      if (foto != null) 'foto': foto,
       'role': role,
     };
   }

@@ -118,11 +118,18 @@ class _DetailDesaState extends State<DetailDesa> {
     });
   }
 
-  void _launchMaps(String mapsUrl) async {
-    if (await canLaunch(mapsUrl)) {
-      await launch(mapsUrl);
+  void _launchMaps(String coordinates) async {
+    List<String> latLong = coordinates.split(',');
+    String latitude = latLong[0];
+    String longitude = latLong[1];
+
+    String googleMapsUrl =
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+
+    if (await canLaunch(googleMapsUrl)) {
+      await launch(googleMapsUrl);
     } else {
-      throw 'Could not launch $mapsUrl';
+      throw 'Could not launch $googleMapsUrl';
     }
   }
 
@@ -186,7 +193,7 @@ class _DetailDesaState extends State<DetailDesa> {
             Stack(
               children: [
                 Image.network(
-                  "http://192.168.43.155:3000/resource/desawisata/${widget.desa.gambar}",
+                  "http://8.215.11.162:3000/resource/desawisata/${widget.desa.gambar}",
                   height: 400,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -396,7 +403,7 @@ class _DetailDesaState extends State<DetailDesa> {
                       children: destinasiWisata
                           .map((destinasi) => WisataCard(
                                 imageUrl:
-                                    'http://192.168.43.155:3000/resource/destinasiwisata/${destinasi.gambar}',
+                                    'http://8.215.11.162:3000/resource/destinasiwisata/${destinasi.gambar}',
                                 title: destinasi.nama,
                                 destinasi: destinasi,
                               ))
@@ -415,7 +422,7 @@ class _DetailDesaState extends State<DetailDesa> {
                       children: akomodasi
                           .map((akomodasi) => AkomodasiCard(
                                 imageUrl:
-                                    'http://192.168.43.155:3000/resource/akomodasi/${akomodasi.gambar}',
+                                    'http://8.215.11.162:3000/resource/akomodasi/${akomodasi.gambar}',
                                 title: akomodasi.nama,
                                 akomodasi: akomodasi,
                               ))
@@ -434,7 +441,7 @@ class _DetailDesaState extends State<DetailDesa> {
                       children: desaWisataLainnya
                           .map((desa) => DesaCard(
                                 imageUrl:
-                                    'http://192.168.43.155:3000/resource/desawisata/${desa.gambar}',
+                                    'http://8.215.11.162:3000/resource/desawisata/${desa.gambar}',
                                 title: desa.nama,
                                 desa: desa,
                               ))

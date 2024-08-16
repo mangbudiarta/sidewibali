@@ -337,6 +337,11 @@ class _DetailDestinasiState extends State<DetailDestinasi> {
                                                 user['foto'] ??
                                                     'https://via.placeholder.com/50',
                                               ),
+                                              onBackgroundImageError: (_, __) {
+                                                // Jika gambar dari URL tidak berhasil dimuat, gunakan gambar dari assets
+                                                 Image.asset(
+                                                    'assets/images/default_profile.png');
+                                              },
                                             ),
                                             const SizedBox(width: 8),
                                             Expanded(

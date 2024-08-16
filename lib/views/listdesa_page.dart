@@ -66,7 +66,10 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
       appBar: AppBar(
         title: const Text(
           'Desa Wisata',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: "nunitoBold"),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -97,6 +100,7 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
+                style: const TextStyle(fontFamily: 'nunitoRegular'),
               ),
             ),
             const SizedBox(height: 16.0),
@@ -108,7 +112,10 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: ChoiceChip(
-                      label: Text(category),
+                      label: Text(
+                        category,
+                        style: const TextStyle(fontFamily: 'nunitoRegular'),
+                      ),
                       labelStyle: const TextStyle(color: Colors.black),
                       backgroundColor: Colors.grey[200],
                       selectedColor: const Color.fromARGB(255, 172, 241, 244),
@@ -152,7 +159,10 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: Text(
+                            value,
+                            style: const TextStyle(fontFamily: 'nunitoRegular'),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -170,16 +180,14 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
                   } else {
                     List<DesaWisata> filteredDesaList =
                         getFilteredDesaWisata(snapshot.data ?? []);
-                    if (filteredDesaList.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'Belum ada desa wisata yang sesuai',
-                          style:
-                              TextStyle(fontSize: 16, color: Colors.grey[600]),
-                        ),
-                      );
-                    }
-                    return ListView.builder(
+                    return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Two columns
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                        childAspectRatio: 3 / 4, // Adjust as needed
+                      ),
                       itemCount: filteredDesaList.length,
                       itemBuilder: (context, index) {
                         return _buildDestinationCard(filteredDesaList[index]);
@@ -207,41 +215,75 @@ class _DesaWisataPageState extends State<DesaWisataPage> {
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: Image.network(
+                      "http://8.215.11.162:3000/resource/desawisata/${desa.gambar}",
+                      height: 100,
+                      width: 165,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/default_image.png',
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                desa.nama,
+                style: const TextStyle(
+                  fontFamily: "nunitoSemiBold",
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    size: 14,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    desa.kabupaten,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontFamily: 'nunitoRegular',
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                "http://192.168.43.155:3000/resource/desawisata/${desa.gambar}",
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/default_image.png',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            ),
-            title: Text(desa.nama),
-            subtitle: Text(desa.kabupaten),
           ),
         ),
       ),

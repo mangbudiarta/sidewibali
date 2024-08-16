@@ -54,7 +54,7 @@ class _ProfilPageState extends State<ProfilPage> {
           _noTelpController.text = userDetails['no_telp'] ?? '';
           _passwordController.text = '';
           foto = userDetails['foto'] != null
-              ? 'http://192.168.43.155:3000/resource/akun/${userDetails['foto']}'
+              ? 'http://8.215.11.162:3000/resource/akun/${userDetails['foto']}'
               : null;
         });
       }
@@ -313,37 +313,33 @@ class _ProfilPageState extends State<ProfilPage> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? userId = prefs.getInt('userId');
-      if (userId != null) {
-        Map<String, dynamic> data = {
-          'id': userId,
-          'nama': _namaLengkapController.text,
-          'email': _emailController.text,
-          'no_telp': _noTelpController.text,
-        };
+      String? accessToken = prefs.getString('token');
 
-        // Tambahkan password jika diisi
-        if (_passwordController.text.isNotEmpty) {
-          data['password'] = _passwordController.text;
-        }
-
-        // Tambahkan foto jika dipilih
-        if (_imageFile != null) {
-          data['foto'] = _imageFile!.path;
-        }
-
-        // Panggil API update
-        final response = await ApiService.updateAkun(data);
-
-        if (response['success']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Profil berhasil diperbarui')),
-          );
-          // Muat ulang data profil
-          _fetchAkunDetails();
-        } else {
-          throw Exception(response['message'] ?? 'Gagal memperbarui profil');
-        }
+      if (userId == null || accessToken == null) {
+        throw Exception("User ID atau token tidak ditemukan");
       }
+
+      String namaLengkap = _namaLengkapController.text;
+      String email = _emailController.text;
+      String noTelp = _noTelpController.text;
+      String password = _passwordController.text;
+      String? fotoPath = _imageFile?.path;
+
+      await ApiService.updateUser(
+        id: userId,
+        nama: namaLengkap,
+        no_telp: noTelp,
+        email: email.isNotEmpty ? email : null,
+        password: password.isNotEmpty ? password : null,
+        fotoPath: fotoPath != null && fotoPath.isNotEmpty ? fotoPath : null,
+        accessToken: accessToken,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profil berhasil diperbarui')),
+      );
+
+      await _fetchAkunDetails();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Terjadi kesalahan: $e')),
