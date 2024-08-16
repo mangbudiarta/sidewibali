@@ -1,5 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io';
+
+import 'dart:convert';
+import 'dart:io' show File, HttpHeaders;
+import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidewibali/models/akomodasi_model.dart';
 import 'package:sidewibali/models/assetsdestinasi_model.dart';
@@ -12,12 +18,11 @@ import 'package:sidewibali/models/paketwisata_model.dart';
 import 'package:sidewibali/models/produk_model.dart';
 import 'package:sidewibali/models/ulasan_model.dart';
 import 'package:sidewibali/models/notifikasi_model.dart';
-import 'dart:convert';
 import '../models/user_model.dart';
 
 class ApiService {
   // api
-  static const String _baseUrl = 'http://192.168.43.155:3000';
+  static const String _baseUrl = 'http://8.215.11.162:3000';
 
   // Fungsi untuk melakukan register User
   static Future<bool> registerUser(User user) async {
@@ -95,55 +100,72 @@ class ApiService {
   }
 
   // Fungsi untuk melakukan update data User
-  static Future<Map<String, dynamic>> updateAkun(
-      Map<String, dynamic> data) async {
-    final url = Uri.parse('$_baseUrl/akun/${data['id']}');
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
+  static Future<void> updateUser({
+    required int id,
+    required String nama,
+    required String no_telp,
+    String? email,
+    String? password,
+    String? fotoPath,
+    required String accessToken,
+  }) async {
+    var request = http.MultipartRequest(
+      'PATCH',
+      Uri.parse('$_baseUrl/akun/$id'),
+    );
 
-    if (!data.containsKey('foto') || data['foto'] == null || kIsWeb) {
-      final response = await http.patch(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'nama': data['nama'],
-          'email': data['email'],
-          'no_telp': data['no_telp'],
-          'password': data['password'] ?? '',
-        }),
-      );
+    request.fields['nama'] = nama;
+    request.fields['no_telp'] = no_telp;
+    if (email != null) {
+      request.fields['email'] = email;
+    }
+    if (password != null) {
+      request.fields['password'] = password;
+    }
 
-      if (response.statusCode == 200) {
-        return {'success': true, 'data': jsonDecode(response.body)};
+    if (fotoPath != null && fotoPath.isNotEmpty) {
+      final mimeTypeData = lookupMimeType(fotoPath);
+
+      if (mimeTypeData != null) {
+        final mimeType = mimeTypeData.split('/');
+        final file = await http.MultipartFile.fromPath(
+          'foto',
+          fotoPath,
+          contentType: MediaType(mimeType[0], mimeType[1]),
+        );
+        request.files.add(file);
       } else {
-        throw Exception('Failed to update account');
+        final fileExtension = path.extension(fotoPath).toLowerCase();
+        String? mimeType;
+        if (fileExtension == '.jpg' || fileExtension == '.jpeg') {
+          mimeType = 'image/jpeg';
+        } else if (fileExtension == '.png') {
+          mimeType = 'image/png';
+        }
+
+        if (mimeType != null) {
+          final file = await http.MultipartFile.fromPath(
+            'foto',
+            fotoPath,
+            contentType: MediaType.parse(mimeType),
+          );
+          request.files.add(file);
+        } else {
+          throw Exception('Mime type tidak valid untuk file foto.');
+        }
       }
+    }
+
+    request.headers.addAll({
+      HttpHeaders.authorizationHeader: 'Bearer $accessToken',
+    });
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('User updated successfully');
     } else {
-      var request = http.MultipartRequest('PATCH', url)
-        ..headers['Authorization'] = 'Bearer $token'
-        ..fields['nama'] = data['nama']
-        ..fields['email'] = data['email']
-        ..fields['no_telp'] = data['no_telp'];
-
-      if (data['password'] != null && data['password'].isNotEmpty) {
-        request.fields['password'] = data['password'];
-      }
-
-      request.files
-          .add(await http.MultipartFile.fromPath('foto', data['foto']));
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        final responseData = await http.Response.fromStream(response);
-        return {'success': true, 'data': jsonDecode(responseData.body)};
-      } else {
-        final responseData = await http.Response.fromStream(response);
-        throw Exception('Failed to update account');
-      }
+      throw Exception('Gagal memperbarui profil');
     }
   }
 

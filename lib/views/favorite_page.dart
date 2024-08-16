@@ -142,7 +142,7 @@ class _FavoritePageState extends State<FavoritePage>
 
     for (int id in destinationId) {
       final response = await http.get(
-        Uri.parse('http://192.168.43.155:3000/destinasiwisata/$id'),
+        Uri.parse('http://8.215.11.162:3000/destinasiwisata/$id'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ class _FavoritePageState extends State<FavoritePage>
 
     for (int id in desaId) {
       final response = await http.get(
-        Uri.parse('http://192.168.43.155:3000/desawisata/$id'),
+        Uri.parse('http://8.215.11.162:3000/desawisata/$id'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -265,7 +265,7 @@ class _FavoritePageState extends State<FavoritePage>
                                 top: Radius.circular(20),
                                 bottom: Radius.circular(20)),
                             child: Image.network(
-                              "http://192.168.43.155:3000/resource/destinasiwisata/$image",
+                              "http://8.215.11.162:3000/resource/destinasiwisata/$image",
                               width: double.infinity,
                               height: 160,
                               fit: BoxFit.cover,
@@ -379,7 +379,7 @@ class _FavoritePageState extends State<FavoritePage>
                                 top: Radius.circular(20),
                                 bottom: Radius.circular(20)),
                             child: Image.network(
-                              "http://192.168.43.155:3000/resource/desawisata/$image",
+                              "http://8.215.11.162:3000/resource/desawisata/$image",
                               width: double.infinity,
                               height: 160,
                               fit: BoxFit.cover,

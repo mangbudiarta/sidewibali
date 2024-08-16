@@ -56,7 +56,10 @@ class _ProdukPageState extends State<ProdukPage> {
       appBar: AppBar(
         title: const Text(
           'Produk',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontFamily: 'NunitoBold',
+            fontSize: 24,
+          ),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -98,9 +101,20 @@ class _ProdukPageState extends State<ProdukPage> {
                             child: Text(
                             'Belum ada produk yang sesuai',
                             style: TextStyle(
-                                fontSize: 16, color: Colors.grey[600]),
+                              fontFamily: 'NunitoRegular',
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
                           ))
-                        : ListView.builder(
+                        : GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, // Mengatur jumlah kolom grid
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
+                              childAspectRatio:
+                                  3 / 4, // Mengatur rasio aspek item
+                            ),
                             itemCount: filteredProduk.length,
                             itemBuilder: (context, index) {
                               var produk = filteredProduk[index];
@@ -143,47 +157,77 @@ class CardProduk extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    "http://8.215.11.162:3000/resource/produk/${produk.gambar}",
+                    width: 165,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/default_image.png',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  produk.nama,
+                  style: TextStyle(
+                    fontFamily: 'NunitoSemiBold',
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      size: 16,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      desaMap[produk.idDesawisata] ?? 'Desa Tidak Diketahui',
+                      style: TextStyle(
+                        fontFamily: 'NunitoRegular',
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
-          ),
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                "http://192.168.43.155:3000/resource/produk/${produk.gambar}",
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/default_image.png',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            ),
-            title: Text(produk.nama),
-            subtitle: Row(
-              children: [
-                Text(desaMap[produk.idDesawisata] ?? 'Desa Tidak Diketahui'),
-              ],
-            ),
           ),
         ),
       ),

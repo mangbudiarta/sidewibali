@@ -57,7 +57,10 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
       appBar: AppBar(
         title: const Text(
           'Akomodasi',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: "nunitoBold"),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -88,6 +91,7 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
+                style: const TextStyle(fontFamily: 'nunitoRegular'),
               ),
             ),
             const SizedBox(height: 16.0),
@@ -99,7 +103,10 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: ChoiceChip(
-                      label: Text(category),
+                      label: Text(
+                        category,
+                        style: const TextStyle(fontFamily: 'nunitoRegular'),
+                      ),
                       labelStyle: const TextStyle(color: Colors.black),
                       backgroundColor: Colors.grey[200],
                       selectedColor: const Color.fromARGB(255, 172, 241, 244),
@@ -117,14 +124,26 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
                 }).toList(),
               ),
             ),
+            const SizedBox(height: 16.0),
             Expanded(
               child: filteredAccommodations.isEmpty
                   ? Center(
                       child: Text(
                       'Belum ada akomodasi yang sesuai',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontFamily: 'nunitoRegular',
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
                     ))
-                  : ListView.builder(
+                  : GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Two columns
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                        childAspectRatio: 3 / 4, // Adjust as needed
+                      ),
                       itemCount: filteredAccommodations.length,
                       itemBuilder: (BuildContext context, int index) {
                         return _buildAccommodationCard(
@@ -150,41 +169,72 @@ class _AkomodasiPageState extends State<AkomodasiPage> {
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    "http://8.215.11.162:3000/resource/akomodasi/${accommodation.gambar}",
+                    height: 100,
+                    width: 165,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/default_image.png',
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                accommodation.nama,
+                style: const TextStyle(
+                  fontFamily: "nunitoSemiBold",
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.category,
+                    size: 14,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    accommodation.kategori,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontFamily: 'nunitoRegular',
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                "http://192.168.43.155:3000/resource/akomodasi/${accommodation.gambar}",
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/default_image.png',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            ),
-            title: Text(accommodation.nama),
-            subtitle: Text(accommodation.kategori),
           ),
         ),
       ),
